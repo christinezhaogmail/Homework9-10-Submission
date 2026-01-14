@@ -1,0 +1,76 @@
+# Core AI/ML Libraries
+langchain==0.1.0
+langchain-core==0.1.10
+langchain-community==0.0.13
+openai==1.6.1
+tiktoken==0.5.2
+
+# LLM Integration
+ollama==0.1.6
+
+# Audio Processing
+openai-whisper==20231117
+sounddevice==0.4.6
+soundfile==0.12.1
+numpy==1.24.3
+scipy==1.11.4
+# pyaudio - Not needed (using sounddevice instead)
+# If you need pyaudio on macOS: brew install portaudio && pip install pyaudio
+
+# arXiv Search
+arxiv==2.1.0
+
+# Math/Calculation
+sympy==1.12
+
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Frontend
+streamlit==1.30.0
+streamlit-webrtc==0.47.1
+
+# Utilities
+requests==2.31.0
+pydantic==2.5.3
+python-dotenv==1.0.0
+aiofiles==23.2.1
+
+# Logging
+loguru==0.7.2
+
+# TTS
+pyttsx3>=2.99  # Version 2.90 has a bug on macOS with objc import
+# pyttsx3 dependencies for macOS (required for Objective-C bridge)
+pyobjc-core>=9.0
+pyobjc-framework-Cocoa>=9.0
+
+# PyTorch (required for CosyVoice and GPU deployment)
+torch>=2.0.0
+torchaudio>=2.0.0
+# For NVIDIA GPU: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# CosyVoice dependencies (OPTIONAL - for GPU deployment only)
+# Note: CosyVoice should be installed separately from the GitHub repo
+# git clone https://github.com/FunAudioLLM/CosyVoice.git
+# cd CosyVoice && pip install -r requirements.txt
+#
+# On macOS (development), use system TTS instead:
+# - Set TTS_BACKEND=system in .env
+# - CosyVoice dependencies below are only needed for GPU deployment
+#
+# To install CosyVoice dependencies on GPU server (not macOS):
+# pip install transformers accelerate librosa hydra-core omegaconf onnxruntime pydub hyperpyyaml WeTextProcessing
+#
+# For macOS development, these are optional and may fail to install:
+# transformers>=4.30.0
+# accelerate>=0.20.0
+# librosa>=0.10.0
+# hydra-core>=1.3.0
+# omegaconf>=2.3.0
+# onnxruntime>=1.15.0
+# pydub>=0.25.0
+# hyperpyyaml>=1.2.0
+# WeTextProcessing>=1.0.0  # Requires OpenFST - difficult on macOS M3

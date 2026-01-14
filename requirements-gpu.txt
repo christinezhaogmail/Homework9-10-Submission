@@ -1,0 +1,34 @@
+# GPU Deployment Requirements
+# Install these on your NVIDIA GPU server (Ubuntu/Linux)
+# DO NOT install on macOS - use system TTS instead
+
+# Core requirements (from requirements.txt)
+-r requirements.txt
+
+# PyTorch with CUDA support (uncomment for your CUDA version)
+# For CUDA 11.8:
+# torch>=2.0.0 --index-url https://download.pytorch.org/whl/cu118
+# torchaudio>=2.0.0 --index-url https://download.pytorch.org/whl/cu118
+
+# For CUDA 12.1:
+# torch>=2.0.0 --index-url https://download.pytorch.org/whl/cu121
+# torchaudio>=2.0.0 --index-url https://download.pytorch.org/whl/cu121
+
+# CosyVoice dependencies (for Linux/GPU only)
+transformers>=4.30.0
+accelerate>=0.20.0
+librosa>=0.10.0
+hydra-core>=1.3.0
+omegaconf>=2.3.0
+onnxruntime>=1.15.0
+pydub>=0.25.0
+hyperpyyaml>=1.2.0
+WeTextProcessing>=1.0.0
+
+# Note: On Linux, you may need to install OpenFST first:
+# Ubuntu/Debian: sudo apt-get install libfst-dev
+# CentOS/RHEL: sudo yum install openfst-devel
+
+# Then install CosyVoice:
+# cd /opt/CosyVoice
+# pip install -r requirements.txt
