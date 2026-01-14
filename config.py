@@ -16,8 +16,9 @@ class Config:
 
     # Ollama/LLM settings
     OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-    LLM_MODEL = os.getenv("LLM_MODEL", "my-lama3-finetuned-Q4_K_M")
+    LLM_MODEL = os.getenv("LLM_MODEL", "hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M")
     LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.7"))
+    SUMMARIZATION_TEMPERATURE = float(os.getenv("SUMMARIZATION_TEMPERATURE", "0.3"))
 
     # Whisper settings
     WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")  # tiny, base, small, medium, large
