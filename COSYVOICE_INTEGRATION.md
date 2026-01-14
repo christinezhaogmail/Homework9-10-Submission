@@ -44,7 +44,7 @@ Based on your environment:
 
 ```bash
 # Activate your conda environment
-conda activate hw6_310
+conda activate hw9_311
 
 # Install requirements (includes PyTorch and CosyVoice dependencies)
 pip install -r requirements.txt

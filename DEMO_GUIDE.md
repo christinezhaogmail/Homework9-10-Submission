@@ -138,7 +138,7 @@ All interactions are logged, and the agent handles errors gracefully."
 
 ### Before Recording:
 1. Start Ollama server: `ollama serve`
-2. Ensure conda environment is activated: `conda activate hw6_310`
+2. Ensure conda environment is activated: `conda activate hw9_311`
 3. Start Streamlit: `streamlit run frontend.py`
 4. Test all three queries to ensure they work
 5. Clear conversation history for a clean demo

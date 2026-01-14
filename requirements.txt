@@ -44,33 +44,7 @@ loguru==0.7.2
 # TTS
 pyttsx3>=2.99  # Version 2.90 has a bug on macOS with objc import
 # pyttsx3 dependencies for macOS (required for Objective-C bridge)
-pyobjc-core>=9.0
-pyobjc-framework-Cocoa>=9.0
 
 # PyTorch (required for CosyVoice and GPU deployment)
 torch>=2.0.0
 torchaudio>=2.0.0
-# For NVIDIA GPU: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-
-# CosyVoice dependencies (OPTIONAL - for GPU deployment only)
-# Note: CosyVoice should be installed separately from the GitHub repo
-# git clone https://github.com/FunAudioLLM/CosyVoice.git
-# cd CosyVoice && pip install -r requirements.txt
-#
-# On macOS (development), use system TTS instead:
-# - Set TTS_BACKEND=system in .env
-# - CosyVoice dependencies below are only needed for GPU deployment
-#
-# To install CosyVoice dependencies on GPU server (not macOS):
-# pip install transformers accelerate librosa hydra-core omegaconf onnxruntime pydub hyperpyyaml WeTextProcessing
-#
-# For macOS development, these are optional and may fail to install:
-# transformers>=4.30.0
-# accelerate>=0.20.0
-# librosa>=0.10.0
-# hydra-core>=1.3.0
-# omegaconf>=2.3.0
-# onnxruntime>=1.15.0
-# pydub>=0.25.0
-# hyperpyyaml>=1.2.0
-# WeTextProcessing>=1.0.0  # Requires OpenFST - difficult on macOS M3

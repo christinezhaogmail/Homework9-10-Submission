@@ -16,8 +16,8 @@ Get the AI Voice Agent running in 5 minutes!
 bash setup.sh
 
 # Or manually:
-conda create -n hw6_310 python=3.10 -y
-conda activate hw6_310
+conda create -n hw9_311 python=3.10 -y
+conda activate hw9_311
 pip install -r requirements.txt
 ollama pull my-lama3-finetuned-Q4_K_M
 ```
@@ -33,19 +33,19 @@ ollama serve
 
 **Option A: Quick Start CLI (Simplest)**
 ```bash
-conda activate hw6_310
+conda activate hw9_311
 python quick_start.py
 ```
 
 **Option B: Streamlit Web Interface (Best)**
 ```bash
-conda activate hw6_310
+conda activate hw9_311
 streamlit run frontend.py
 ```
 
 **Option C: Easy Launcher**
 ```bash
-conda activate hw6_310
+conda activate hw9_311
 python run.py
 # Then choose your option
 ```
@@ -53,7 +53,7 @@ python run.py
 ## Test It
 
 ```bash
-conda activate hw6_310
+conda activate hw9_311
 python test_agent.py
 ```
 
@@ -71,7 +71,7 @@ Try these in the interface:
 - Start Ollama: `ollama serve`
 
 **Error: "Module not found"**
-- Activate environment: `conda activate hw6_310`
+- Activate environment: `conda activate hw9_311`
 - Install dependencies: `pip install -r requirements.txt`
 
 **Error: "Model not found"**

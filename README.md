@@ -47,8 +47,8 @@ User Voice Output ← TTS ← Response Text ← Function Result ← [calculate/s
 
 ```bash
 # Create and activate conda environment
-conda create -n hw6_310 python=3.10 -y
-conda activate hw6_310
+conda create -n hw9_311 python=3.11 -y
+conda activate hw9_311
 ```
 
 ### 2. Install Dependencies
@@ -330,7 +330,7 @@ For GPU deployment with CosyVoice, see [GPU_DEPLOYMENT.md](GPU_DEPLOYMENT.md).
 - Other OS: Install pyttsx3: `pip install pyttsx3`
 
 ### Issue: "Module not found"
-**Solution**: Ensure conda environment is activated: `conda activate hw6_310`
+**Solution**: Ensure conda environment is activated: `conda activate hw9_311`
 
 ### Issue: "API connection refused"
 **Solution**: Start the backend server: `python backend.py`

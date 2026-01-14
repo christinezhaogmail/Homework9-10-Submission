@@ -30,7 +30,7 @@ ollama serve
 
 ```bash
 # Terminal 2
-conda activate hw6_310
+conda activate hw9_311
 streamlit run frontend.py
 ```
 

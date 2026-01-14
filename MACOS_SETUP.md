@@ -26,10 +26,10 @@ brew install espeak
 
 ```bash
 # Create environment with Python 3.10
-conda create -n hw6_310 python=3.10 -y
+conda create -n hw9_311 python=3.10 -y
 
 # Activate environment
-conda activate hw6_310
+conda activate hw9_311
 ```
 
 ### 4. Install Python Packages
@@ -157,8 +157,8 @@ Here's a streamlined installation process for macOS M3:
 brew install portaudio espeak ollama
 
 # Step 2: Create conda environment
-conda create -n hw6_310 python=3.10 -y
-conda activate hw6_310
+conda create -n hw9_311 python=3.10 -y
+conda activate hw9_311
 
 # Step 3: Install Python packages
 pip install -r requirements.txt
@@ -185,7 +185,7 @@ ollama serve
 
 ### Terminal 2: Run the Agent
 ```bash
-conda activate hw6_310
+conda activate hw9_311
 
 # Option 1: Quick Start CLI
 python quick_start.py
@@ -265,7 +265,7 @@ curl http://localhost:11434/api/tags
 which python
 
 # Check if in correct environment
-echo $CONDA_DEFAULT_ENV  # Should show hw6_310
+echo $CONDA_DEFAULT_ENV  # Should show hw9_311
 ```
 
 ## Alternative: Using Without Ollama
