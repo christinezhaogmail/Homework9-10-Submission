@@ -35,10 +35,10 @@ nvcc --version
 ```bash
 # Install Python 3.10
 sudo apt update
-sudo apt install python3.10 python3.10-venv python3-pip
+sudo apt install python3.11 python3.11-venv python3-pip
 
 # Create virtual environment
-python3.10 -m venv venv
+python3.11 -m venv venv
 source venv/bin/activate
 
 # Upgrade pip
@@ -62,8 +62,8 @@ python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}'); 
 
 ```bash
 # Clone CosyVoice repository
-cd /opt
-git clone https://github.com/FunAudioLLM/CosyVoice.git
+cd ~/
+sudo git clone https://github.com/FunAudioLLM/CosyVoice.git
 cd CosyVoice
 
 # Install CosyVoice dependencies
@@ -71,15 +71,15 @@ pip install -r requirements.txt
 
 # Download pretrained models
 # Follow CosyVoice documentation to download models
-# Place models in: /opt/CosyVoice/pretrained_models/CosyVoice-300M-SFT
+# Place models in: ~/CosyVoice/pretrained_models/CosyVoice-300M-SFT
 ```
 
 ### 5. Install Voice Agent
 
 ```bash
 # Clone your project
-cd /opt
-git clone <your-repo-url> ai-voice-agent
+cd ~/
+sudo git clone <your-repo-url> ai-voice-agent
 cd ai-voice-agent
 
 # Install dependencies
@@ -96,7 +96,7 @@ ollama pull my-lama3-finetuned-Q4_K_M
 
 ### 1. Update Environment Variables
 
-Create `/opt/ai-voice-agent/.env`:
+Create `~/ai-voice-agent/.env`:
 
 ```bash
 # LLM Settings
@@ -111,8 +111,8 @@ WHISPER_MODEL=base
 TTS_BACKEND=cosyvoice
 
 # CosyVoice Settings
-COSYVOICE_PATH=/opt/CosyVoice
-COSYVOICE_MODEL_DIR=/opt/CosyVoice/pretrained_models/CosyVoice-300M-SFT
+COSYVOICE_PATH=~/CosyVoice
+COSYVOICE_MODEL_DIR=~/CosyVoice/pretrained_models/CosyVoice-300M-SFT
 
 # FastAPI Settings
 API_HOST=0.0.0.0
@@ -131,11 +131,11 @@ LOG_RETENTION=7 days
 python -c "import torch; print(torch.cuda.is_available())"
 
 # Test CosyVoice
-cd /opt/CosyVoice
+cd ~/CosyVoice
 python test_cosyvoice.py  # If available
 
 # Test Voice Agent
-cd /opt/ai-voice-agent
+cd ~/ai-voice-agent
 python test_agent.py
 ```
 
@@ -148,7 +148,7 @@ python test_agent.py
 ollama serve
 
 # Terminal 2: Start FastAPI backend
-cd /opt/ai-voice-agent
+cd ~/ai-voice-agent
 source venv/bin/activate
 python backend.py
 ```
@@ -184,10 +184,10 @@ Requires=ollama.service
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=/opt/ai-voice-agent
-Environment="PATH=/opt/ai-voice-agent/venv/bin"
-Environment="COSYVOICE_PATH=/opt/CosyVoice"
-ExecStart=/opt/ai-voice-agent/venv/bin/python backend.py
+WorkingDirectory=~/ai-voice-agent
+Environment="PATH=~/ai-voice-agent/venv/bin"
+Environment="COSYVOICE_PATH=~/CosyVoice"
+ExecStart=~/ai-voice-agent/venv/bin/python backend.py
 Restart=always
 RestartSec=3
 
@@ -216,8 +216,8 @@ FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
 
 # Install Python
 RUN apt-get update && apt-get install -y \
-    python3.10 \
-    python3.10-venv \
+    python3.11 \
+    python3.11-venv \
     python3-pip \
     git \
     curl \
@@ -230,8 +230,8 @@ RUN curl -fsSL https://ollama.com/install.sh | sh
 WORKDIR /app
 
 # Install CosyVoice
-RUN git clone https://github.com/FunAudioLLM/CosyVoice.git /opt/CosyVoice
-WORKDIR /opt/CosyVoice
+RUN git clone https://github.com/FunAudioLLM/CosyVoice.git ~/CosyVoice
+WORKDIR ~/CosyVoice
 RUN pip install -r requirements.txt
 
 # Install Voice Agent
@@ -258,7 +258,7 @@ docker build -t voice-agent-gpu .
 
 # Run with GPU support
 docker run --gpus all -p 8000:8000 \
-  -v /opt/CosyVoice/pretrained_models:/opt/CosyVoice/pretrained_models \
+  -v ~/CosyVoice/pretrained_models:~/CosyVoice/pretrained_models \
   -e TTS_BACKEND=cosyvoice \
   voice-agent-gpu
 ```

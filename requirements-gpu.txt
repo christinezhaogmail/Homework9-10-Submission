@@ -30,5 +30,5 @@ WeTextProcessing>=1.0.0
 # CentOS/RHEL: sudo yum install openfst-devel
 
 # Then install CosyVoice:
-# cd /opt/CosyVoice
+# cd ~/CosyVoice
 # pip install -r requirements.txt
