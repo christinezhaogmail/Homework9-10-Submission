@@ -1,5 +1,5 @@
 """
-LLM Service: Integration with Ollama/my-lama3-finetuned-Q4_K_M
+LLM Service: Integration with Ollama/hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M
 Handles LLM interactions with function calling support
 """
 
@@ -12,16 +12,16 @@ from config import Config
 
 class LLMService:
     """
-    Service for interacting with LLM (Ollama/my-lama3-finetuned-Q4_K_M)
+    Service for interacting with LLM (Ollama/hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M)
     Supports function calling through structured prompts
     """
 
-    def __init__(self, model: str = "my-lama3-finetuned-Q4_K_M", base_url: str = "http://localhost:11434"):
+    def __init__(self, model: str = "hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M", base_url: str = "http://localhost:11434"):
         """
         Initialize the LLM service
 
         Args:
-            model: The model name to use (default: my-lama3-finetuned-Q4_K_M)
+            model: The model name to use (default: hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M)
             base_url: The Ollama API base URL
         """
         self.model = model

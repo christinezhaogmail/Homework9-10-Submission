@@ -89,7 +89,7 @@ pip install -r requirements.txt
 curl -fsSL https://ollama.com/install.sh | sh
 
 # Pull Llama model
-ollama pull my-lama3-finetuned-Q4_K_M
+ollama pull hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M
 ```
 
 ## Configuration for GPU
@@ -101,7 +101,7 @@ Create `~/ai-voice-agent/.env`:
 ```bash
 # LLM Settings
 OLLAMA_BASE_URL=http://localhost:11434
-LLM_MODEL=my-lama3-finetuned-Q4_K_M
+LLM_MODEL=hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M
 LLM_TEMPERATURE=0.7
 
 # Whisper Settings
@@ -247,7 +247,7 @@ COPY . .
 EXPOSE 8000
 
 # Start services
-CMD ["bash", "-c", "ollama serve & sleep 5 && ollama pull my-lama3-finetuned-Q4_K_M && python backend.py"]
+CMD ["bash", "-c", "ollama serve & sleep 5 && ollama pull hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M && python backend.py"]
 ```
 
 Build and run:
@@ -345,7 +345,7 @@ EOF
 
 Expected performance with GPU:
 - **Whisper (base)**: ~0.2-0.5s per audio
-- **LLM (my-lama3-finetuned-Q4_K_M)**: ~0.5-1.5s per query
+- **LLM (hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M)**: ~0.5-1.5s per query
 - **CosyVoice**: ~1-3s per response (much better quality than system TTS)
 - **Total**: ~2-5s end-to-end
 
@@ -426,7 +426,7 @@ For cloud GPU instances:
 - [ ] CUDA toolkit installed
 - [ ] PyTorch with GPU support verified
 - [ ] CosyVoice installed and tested
-- [ ] Ollama running with my-lama3-finetuned-Q4_K_M
+- [ ] Ollama running with hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M
 - [ ] Voice Agent dependencies installed
 - [ ] Environment variables configured
 - [ ] Services configured (systemd or docker)

@@ -19,7 +19,7 @@ bash setup.sh
 conda create -n hw9_311 python=3.11 -y
 conda activate hw9_311
 pip install -r requirements.txt
-ollama pull my-lama3-finetuned-Q4_K_M
+ollama pull hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M
 ```
 
 ## Running the Agent
@@ -75,7 +75,7 @@ Try these in the interface:
 - Install dependencies: `pip install -r requirements.txt`
 
 **Error: "Model not found"**
-- Pull model: `ollama pull my-lama3-finetuned-Q4_K_M`
+- Pull model: `ollama pull hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M`
 
 ## Next Steps
 

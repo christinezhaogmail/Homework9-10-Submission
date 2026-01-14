@@ -49,7 +49,7 @@ except Exception as e:
     print(f"❌ Error initializing services: {e}")
     print("\nMake sure:")
     print("1. Ollama is running: ollama serve")
-    print("2. my-lama3-finetuned-Q4_K_M is installed: ollama pull my-lama3-finetuned-Q4_K_M")
+    print("2. hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M is installed: ollama pull hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M")
     print("3. Dependencies are installed: pip install -r requirements.txt")
     sys.exit(1)
 
@@ -72,7 +72,7 @@ The AI Voice Agent can:
 
 How it works:
 1. You type a query
-2. The LLM (my-lama3-finetuned-Q4_K_M) analyzes your query
+2. The LLM (hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M) analyzes your query
 3. If needed, it calls a tool (calculate or search_arxiv)
 4. The response is displayed and optionally spoken
 

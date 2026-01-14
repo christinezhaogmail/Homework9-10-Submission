@@ -51,8 +51,8 @@ pip install -r requirements.txt
 # Or use brew:
 brew install ollama
 
-# Pull the my-lama3-finetuned-Q4_K_M model
-ollama pull my-lama3-finetuned-Q4_K_M
+# Pull the hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M model
+ollama pull hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M
 ```
 
 ## Common Issues and Fixes
@@ -167,7 +167,7 @@ pip install -r requirements.txt
 python -c "import whisper; whisper.load_model('base')"
 
 # Step 5: Pull Llama model
-ollama pull my-lama3-finetuned-Q4_K_M
+ollama pull hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M
 
 # Step 6: Create logs directory
 mkdir -p logs
@@ -213,7 +213,7 @@ Test each component:
 python --version  # Should show 3.11.x
 
 # Test Ollama
-ollama list  # Should show my-lama3-finetuned-Q4_K_M
+ollama list  # Should show hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M
 
 # Test system TTS
 say "Hello from macOS"  # Should speak
@@ -246,7 +246,7 @@ WHISPER_MODEL=base
 
 # Standard Ollama config
 OLLAMA_BASE_URL=http://localhost:11434
-LLM_MODEL=my-lama3-finetuned-Q4_K_M
+LLM_MODEL=hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M
 ```
 
 ## Troubleshooting Commands

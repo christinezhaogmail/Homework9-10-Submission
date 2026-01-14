@@ -2,7 +2,7 @@
 
 ## Project Summary
 
-A complete AI Voice Agent application with function calling capabilities, built using my-lama3-finetuned-Q4_K_M, LangChain, Whisper, and modern web technologies.
+A complete AI Voice Agent application with function calling capabilities, built using hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M, LangChain, Whisper, and modern web technologies.
 
 ## Key Features Implemented
 
@@ -11,7 +11,7 @@ A complete AI Voice Agent application with function calling capabilities, built 
 - **calculate(expression)**: Evaluates mathematical expressions using SymPy
 - Both tools properly decorated with `@tool` and include error handling
 
-### 2. LLM Integration (Ollama/my-lama3-finetuned-Q4_K_M)
+### 2. LLM Integration (Ollama/hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M)
 - Flexible LLM service supporting multiple models
 - Custom system prompt teaching function calling
 - JSON-based function call output format
@@ -100,7 +100,7 @@ Homework6-Submission/
 
 ### Core Technologies
 - **Python 3.11**: Programming language
-- **my-lama3-finetuned-Q4_K_M**: LLM via Ollama
+- **hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M**: LLM via Ollama
 - **LangChain**: Tool framework
 - **OpenAI Whisper**: Speech-to-text
 - **FastAPI**: Backend API
@@ -135,7 +135,7 @@ Homework6-Submission/
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                LLM SERVICE (my-lama3-finetuned-Q4_K_M/Ollama)                │
+│                LLM SERVICE (hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M/Ollama)                │
 │   • Analyzes query intent                                   │
 │   • Generates function call JSON or text response           │
 │   • System prompt guides function calling                   │
@@ -188,7 +188,7 @@ Homework6-Submission/
 - Clear separation of concerns
 
 ### 2. Flexible LLM Integration
-- `LLMService` for Ollama/my-lama3-finetuned-Q4_K_M
+- `LLMService` for Ollama/hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M
 - `AlternativeLLMService` for OpenAI/other providers
 - Easy to add new LLM backends
 
@@ -316,7 +316,7 @@ Homework6-Submission/
 ## Credits & Resources
 
 - **Assignment**: Week 6 - Function Calling with Voice Agents
-- **LLM**: my-lama3-finetuned-Q4_K_M by Meta, served via Ollama
+- **LLM**: hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M by Meta, served via Ollama
 - **STT**: OpenAI Whisper
 - **Tools**: LangChain framework
 - **APIs**: arXiv API for paper search
