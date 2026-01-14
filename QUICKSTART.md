@@ -19,7 +19,7 @@ bash setup.sh
 conda create -n hw6_310 python=3.10 -y
 conda activate hw6_310
 pip install -r requirements.txt
-ollama pull llama3.2
+ollama pull my-lama3-finetuned-Q4_K_M
 ```
 
 ## Running the Agent
@@ -75,7 +75,7 @@ Try these in the interface:
 - Install dependencies: `pip install -r requirements.txt`
 
 **Error: "Model not found"**
-- Pull model: `ollama pull llama3.2`
+- Pull model: `ollama pull my-lama3-finetuned-Q4_K_M`
 
 ## Next Steps
 

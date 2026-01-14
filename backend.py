@@ -41,7 +41,7 @@ app.add_middleware(
 )
 
 # Initialize services
-llm_service = LLMService(model="llama3.2")
+llm_service = LLMService(model="my-lama3-finetuned-Q4_K_M")
 function_router = FunctionRouter()
 stt_service = SpeechToTextService(model_name="base")
 tts_service = TextToSpeechService(backend="system")
@@ -89,7 +89,7 @@ async def health_check():
     return {
         "status": "healthy",
         "services": {
-            "llm": "ollama/llama3.2",
+            "llm": "ollama/my-lama3-finetuned-Q4_K_M",
             "stt": "whisper",
             "tts": "system",
             "tools": list(function_router.tool_registry.keys())

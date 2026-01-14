@@ -1,11 +1,11 @@
 # AI Voice Agent with Function Calling
 
-An intelligent voice-enabled AI agent that can listen to user queries, process them using LLM (Llama3.2), execute tools (arXiv search and mathematical calculations), and respond with synthesized speech.
+An intelligent voice-enabled AI agent that can listen to user queries, process them using LLM (my-lama3-finetuned-Q4_K_M), execute tools (arXiv search and mathematical calculations), and respond with synthesized speech.
 
 ## Features
 
 - **Voice Interaction**: Speech-to-Text using OpenAI Whisper
-- **Intelligent LLM**: Llama3.2 via Ollama with function calling capabilities
+- **Intelligent LLM**: my-lama3-finetuned-Q4_K_M via Ollama with function calling capabilities
 - **Tool Execution**:
   - `search_arxiv`: Search scientific papers on arXiv
   - `calculate`: Perform mathematical calculations using SymPy
@@ -25,7 +25,7 @@ An intelligent voice-enabled AI agent that can listen to user queries, process t
 ## Architecture
 
 ```
-User Voice Input → Whisper (STT) → Llama3.2 (LLM) → Function Router → Tools
+User Voice Input → Whisper (STT) → my-lama3-finetuned-Q4_K_M (LLM) → Function Router → Tools
                                                                            ↓
 User Voice Output ← TTS ← Response Text ← Function Result ← [calculate/search_arxiv]
 ```
@@ -34,7 +34,7 @@ User Voice Output ← TTS ← Response Text ← Function Result ← [calculate/s
 
 - Python 3.10+
 - Conda (recommended for environment management)
-- Ollama with Llama3.2 model installed
+- Ollama with my-lama3-finetuned-Q4_K_M model installed
 - macOS (for system TTS) or pyttsx3 for other platforms
 
 **macOS M3 Users**: See [MACOS_SETUP.md](MACOS_SETUP.md) for optimized setup instructions.
@@ -67,8 +67,8 @@ python -c "import whisper; whisper.load_model('base')"
 # Install Ollama (if not already installed)
 # Visit: https://ollama.ai/download
 
-# Pull Llama3.2 model
-ollama pull llama3.2
+# Pull my-lama3-finetuned-Q4_K_M model
+ollama pull my-lama3-finetuned-Q4_K_M
 
 # Start Ollama server (in a separate terminal)
 ollama serve
@@ -267,7 +267,7 @@ Configure the agent using environment variables or `config.py`:
 ```python
 # LLM settings
 OLLAMA_BASE_URL = "http://localhost:11434"
-LLM_MODEL = "llama3.2"
+LLM_MODEL = "my-lama3-finetuned-Q4_K_M"
 
 # Whisper settings
 WHISPER_MODEL = "base"  # tiny, base, small, medium, large
@@ -383,7 +383,7 @@ llm = AlternativeLLMService(api_key="your-api-key", model="gpt-4")
 
 ## Credits
 
-- **LLM**: Llama3.2 via Ollama
+- **LLM**: my-lama3-finetuned-Q4_K_M via Ollama
 - **STT**: OpenAI Whisper
 - **Tools**: LangChain, arXiv API, SymPy
 - **Web Framework**: FastAPI, Streamlit
