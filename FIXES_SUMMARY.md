@@ -109,4 +109,4 @@ All three issues have been tested and verified:
 
 **Date Fixed**: 2025-12-14
 **macOS Version**: macOS M3
-**Python Version**: 3.10
+**Python Version**: 3.11

@@ -99,7 +99,7 @@ Homework6-Submission/
 ## Technology Stack
 
 ### Core Technologies
-- **Python 3.10**: Programming language
+- **Python 3.11**: Programming language
 - **my-lama3-finetuned-Q4_K_M**: LLM via Ollama
 - **LangChain**: Tool framework
 - **OpenAI Whisper**: Speech-to-text

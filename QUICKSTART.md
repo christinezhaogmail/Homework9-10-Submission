@@ -16,7 +16,7 @@ Get the AI Voice Agent running in 5 minutes!
 bash setup.sh
 
 # Or manually:
-conda create -n hw9_311 python=3.10 -y
+conda create -n hw9_311 python=3.11 -y
 conda activate hw9_311
 pip install -r requirements.txt
 ollama pull my-lama3-finetuned-Q4_K_M

@@ -11,7 +11,7 @@ This guide covers deploying the voice agent from macOS development environment t
 - NVIDIA GPU with CUDA support (Tesla, RTX, or A series)
 - CUDA Toolkit 11.8 or 12.1
 - Ubuntu 20.04+ or similar Linux distribution
-- Python 3.10
+- Python 3.11
 - Docker (optional but recommended)
 
 ## GPU Server Setup
@@ -33,7 +33,7 @@ nvcc --version
 ### 2. Install Python and Dependencies
 
 ```bash
-# Install Python 3.10
+# Install Python 3.11
 sudo apt update
 sudo apt install python3.11 python3.11-venv python3-pip
 

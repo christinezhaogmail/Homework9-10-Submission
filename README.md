@@ -32,7 +32,7 @@ User Voice Output ← TTS ← Response Text ← Function Result ← [calculate/s
 
 ## Prerequisites
 
-- Python 3.10+
+- Python 3.11+
 - Conda (recommended for environment management)
 - Ollama with my-lama3-finetuned-Q4_K_M model installed
 - macOS (for system TTS) or pyttsx3 for other platforms
