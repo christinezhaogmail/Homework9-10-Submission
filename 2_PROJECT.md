@@ -33,13 +33,13 @@ def get_device():
 
 ### 1.2 Environment Files
 
-**`env_mac.yml` (Development)**
+**`requirements/env_mac.yml` (Development)**
 
 * Python 3.10
 * `whisper` + `ctranslate2` (optimized for ARM)
 * `faiss-cpu`
 
-**`env_server.yml` (Production)**
+**`requirements/env_server.yml` (Production)**
 
 * Python 3.10
 * `whisper` + `cuda12`
@@ -131,7 +131,7 @@ The streamlit UI will include:
 Your README will include:
 
 1. **Installation:** Step-by-step Conda setup for both Mac and Server.
-2. **Configuration:** How to add the Notion `secret_token` and `database_id`.
+2. **Configuration:** How to add the Notion integration token (starting with `ntn_`) and `database_id`.
 3. **Voice Cloning:** Where to place the `reference.wav` for CosyVoice zero-shot cloning.
 4. **Usage:** How to launch the streamlit UI vs. the FastAPI backend.
 

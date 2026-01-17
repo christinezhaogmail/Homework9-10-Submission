@@ -443,7 +443,7 @@
 │ │ COSYVOICE_PATH=/home/jovyan/CosyVoice                   │ │
 │ │                                                     │ │
 │ │ # Notion Integration                                │ │
-│ │ NOTION_TOKEN=secret_xyz123...                       │ │
+│ │ NOTION_TOKEN=ntn_xyz123...                       │ │
 │ │ NOTION_DATABASE_ID=abc123...                        │ │
 │ │                                                     │ │
 │ │ # ArXiv                                             │ │

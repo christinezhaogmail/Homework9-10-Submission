@@ -95,7 +95,7 @@ Most tests run without additional configuration:
 
 4. **Set Environment Variables:**
    ```bash
-   export NOTION_TOKEN="secret_xyz..."
+   export NOTION_TOKEN="ntn_xyz..."
    export NOTION_DATABASE_ID="abc123..."
    ```
 

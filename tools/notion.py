@@ -95,13 +95,24 @@ class NotionSync:
 
         Returns:
             URL of created Notion page, or None if sync failed
+
+        Note:
+            This method works with any Notion database. Only the "Name" (title) property
+            is required. Other properties (Session ID, Date, Query Count) are optional
+            and will only be added if they exist in your database.
         """
         if not self.is_enabled():
             logger.warning("Notion sync is not enabled - skipping")
             return None
 
         try:
-            # Prepare page properties
+            # Get database schema to check available properties
+            database_info = self.client.databases.retrieve(database_id=self.database_id)
+            available_properties = set(database_info.get("properties", {}).keys())
+
+            logger.info(f"Available Notion properties: {available_properties}")
+
+            # Prepare page properties - only include Name (title) which is always required
             properties = {
                 "Name": {
                     "title": [
@@ -111,8 +122,12 @@ class NotionSync:
                             }
                         }
                     ]
-                },
-                "Session ID": {
+                }
+            }
+
+            # Only add optional properties if they exist in the database
+            if "Session ID" in available_properties:
+                properties["Session ID"] = {
                     "rich_text": [
                         {
                             "text": {
@@ -120,17 +135,18 @@ class NotionSync:
                             }
                         }
                     ]
-                },
-                "Date": {
+                }
+
+            if "Date" in available_properties:
+                properties["Date"] = {
                     "date": {
                         "start": datetime.now().isoformat()
                     }
                 }
-            }
 
-            # Add metadata if provided
+            # Add metadata if provided and properties exist
             if metadata:
-                if "query_count" in metadata:
+                if "query_count" in metadata and "Query Count" in available_properties:
                     properties["Query Count"] = {
                         "number": metadata["query_count"]
                     }

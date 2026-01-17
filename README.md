@@ -118,7 +118,7 @@ git clone https://github.com/christinezhaogmail/ai-research-assistant.git
 cd ai-research-assistant
 
 # 2. Create conda environment
-conda env create -f env_mac.yml
+conda env create -f requirements/env_mac.yml
 conda activate ai-research-assistant-mac
 
 # 3. Install Ollama
@@ -343,7 +343,7 @@ COSYVOICE_PATH=/home/jovyan/CosyVoice
 COSYVOICE_MODEL_DIR=/home/jovyan/CosyVoice/pretrained_models/CosyVoice-300M-SFT
 
 # Notion Integration (Optional)
-NOTION_TOKEN=secret_xyz123...
+NOTION_TOKEN=ntn_xyz123...
 NOTION_DATABASE_ID=abc123def456...
 
 # ArXiv Search
@@ -379,7 +379,7 @@ LOG_LEVEL=INFO
 
 4. **Set Environment Variables**:
    ```bash
-   export NOTION_TOKEN="secret_xyz..."
+   export NOTION_TOKEN="ntn_xyz..."
    export NOTION_DATABASE_ID="abc123..."
    ```
 
@@ -463,8 +463,8 @@ ai-research-assistant/
 ├── .env                    # Environment variables (not in git)
 ├── .env.example           # Example environment file
 ├── requirements.txt       # Python dependencies
-├── env_mac.yml           # Conda environment (macOS)
-├── env_server.yml        # Conda environment (GPU server)
+├── requirements/env_mac.yml           # Conda environment (macOS)
+├── requirements/env_server.yml        # Conda environment (GPU server)
 ├── ARCHITECTURE.md       # System architecture documentation
 ├── INSTALLATION.md       # Detailed installation guide
 └── README.md             # This file

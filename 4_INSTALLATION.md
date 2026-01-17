@@ -22,7 +22,7 @@ cd ai-research-assistant
 
 ```bash
 # Create environment from yml file
-conda env create -f env_mac.yml
+conda env create -f requirements/env_mac.yml
 
 # Activate environment
 conda activate ai-research-assistant-mac
@@ -114,7 +114,7 @@ cd ai-research-assistant
 
 ```bash
 # Create environment from yml file
-conda env create -f env_server.yml
+conda env create -f requirements/env_server.yml
 
 # Activate environment
 conda activate ai-research-assistant-gpu
@@ -327,7 +327,7 @@ To update the application:
 git pull origin main
 
 # Update conda environment
-conda env update -f env_mac.yml  # or env_server.yml
+conda env update -f requirements/env_mac.yml  # or requirements/env_server.yml
 
 # Restart services
 ```
