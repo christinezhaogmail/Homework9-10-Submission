@@ -15,7 +15,7 @@ fi
 echo "✅ Conda found"
 
 # Check if environment exists
-ENV_NAME="hw6_310"
+ENV_NAME="hw9_310"
 if conda env list | grep -q "^${ENV_NAME} "; then
     echo "⚠️  Environment ${ENV_NAME} already exists"
     read -p "Do you want to recreate it? (y/n) " -n 1 -r
