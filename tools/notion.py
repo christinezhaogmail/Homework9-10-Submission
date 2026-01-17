@@ -106,13 +106,11 @@ class NotionSync:
             return None
 
         try:
-            # Get database schema to check available properties
-            database_info = self.client.databases.retrieve(database_id=self.database_id)
-            available_properties = set(database_info.get("properties", {}).keys())
+            # Prepare page properties
+            # Note: We set all properties regardless of schema check, as some Notion databases
+            # (especially those with data sources) don't expose properties in databases.retrieve()
+            # Notion will gracefully ignore properties that don't exist in the database
 
-            logger.info(f"Available Notion properties: {available_properties}")
-
-            # Prepare page properties - only include Name (title) which is always required
             properties = {
                 "Name": {
                     "title": [
@@ -122,12 +120,8 @@ class NotionSync:
                             }
                         }
                     ]
-                }
-            }
-
-            # Only add optional properties if they exist in the database
-            if "Session ID" in available_properties:
-                properties["Session ID"] = {
+                },
+                "Session ID": {
                     "rich_text": [
                         {
                             "text": {
@@ -135,21 +129,19 @@ class NotionSync:
                             }
                         }
                     ]
-                }
-
-            if "Date" in available_properties:
-                properties["Date"] = {
+                },
+                "Date": {
                     "date": {
                         "start": datetime.now().isoformat()
                     }
                 }
+            }
 
-            # Add metadata if provided and properties exist
-            if metadata:
-                if "query_count" in metadata and "Query Count" in available_properties:
-                    properties["Query Count"] = {
-                        "number": metadata["query_count"]
-                    }
+            # Add metadata if provided
+            if metadata and "query_count" in metadata:
+                properties["Query Count"] = {
+                    "number": metadata["query_count"]
+                }
 
             # Prepare page content
             children = []
