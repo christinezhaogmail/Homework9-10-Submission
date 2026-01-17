@@ -497,7 +497,7 @@ if user_input and not st.session_state.processing_query:
 st.divider()
 st.markdown("""
 <div style='text-align: center; color: gray;'>
-    <p>🎙️ AI Voice Agent with Speech I/O | Built with Streamlit, FastAPI, hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M, LangChain, Whisper & CosyVoice</p>
+    <p>🎙️ AI Voice Agent with Speech I/O | Built with Streamlit, FastAPI, Llama3.2, LangChain, Whisper & CosyVoice</p>
     <p style='font-size: 0.8em;'>Audio Input: st.audio_input() | Audio Output: st.audio() | TTS: System/pyttsx3/CosyVoice</p>
 </div>
 """, unsafe_allow_html=True)

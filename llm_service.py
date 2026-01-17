@@ -1,5 +1,5 @@
 """
-LLM Service: Integration with Ollama/hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M
+LLM Service: Integration with Ollama/Llama3.2
 Handles LLM interactions with function calling support
 """
 
@@ -12,16 +12,16 @@ from config import Config
 
 class LLMService:
     """
-    Service for interacting with LLM (Ollama/hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M)
+    Service for interacting with LLM (Ollama/Llama3.2)
     Supports function calling through structured prompts
     """
 
-    def __init__(self, model: str = "hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M", base_url: str = "http://localhost:11434"):
+    def __init__(self, model: str = "llama3.2", base_url: str = "http://localhost:11434"):
         """
         Initialize the LLM service
 
         Args:
-            model: The model name to use (default: hf.co/Christine-HiAiPerf/llama3-8b-qlora-finetuned-Q4_K_M-GGUF:Q4_K_M)
+            model: The model name to use (default: llama3.2)
             base_url: The Ollama API base URL
         """
         self.model = model
@@ -42,25 +42,19 @@ class LLMService:
         return f"""You are a helpful AI assistant with access to tools. You can help users with:
 1. Searching scientific papers on arXiv
 2. Performing mathematical calculations
-3. Summarizing text passages
 
 When a user asks a question:
 - If they want to search for scientific papers, academic research, or information about a specific topic that requires research, respond with a JSON function call to search_arxiv.
 - If they want to perform a mathematical calculation, respond with a JSON function call to calculate.
-- If you receive search results that are long or complex, call summarize to create a concise summary for the user.
 - For general conversation or questions that don't require tools, respond normally with text.
 
 Function call format (respond ONLY with the JSON, no additional text):
 {{"function": "search_arxiv", "arguments": {{"query": "your search query", "limit": {arxiv_limit}}}}}
 {{"function": "calculate", "arguments": {{"expression": "mathematical expression"}}}}
-{{"function": "summarize", "arguments": {{"texts": ["text passage 1", "text passage 2"]}}}}
 
 Examples:
 User: "What is quantum entanglement?"
 Response: {{"function": "search_arxiv", "arguments": {{"query": "quantum entanglement", "limit": {arxiv_limit}}}}}
-
-Tool Result: [Long arXiv search results]
-Response: {{"function": "summarize", "arguments": {{"texts": ["summary text from papers"]}}}}
 
 User: "What is 25 multiplied by 4?"
 Response: {{"function": "calculate", "arguments": {{"expression": "25*4"}}}}
@@ -69,34 +63,27 @@ User: "Hello, how are you?"
 Response: Hello! I'm doing well, thank you for asking. How can I help you today?
 
 Important rules:
-- For research/scientific questions, FIRST use search_arxiv to find papers
-- After receiving arXiv search results, use summarize to condense the information for the user
+- For research/scientific questions, use search_arxiv with limit={arxiv_limit}
 - For math problems, use calculate
 - For general chat, respond normally
 - When using a function, respond ONLY with the JSON, nothing else
 - Be helpful and friendly
 """
 
-    def generate_response(self, user_message: str, conversation_history: Optional[list] = None, use_full_prompt: bool = False) -> str:
+    def generate_response(self, user_message: str, conversation_history: Optional[list] = None) -> str:
         """
         Generate a response from the LLM
 
         Args:
-            user_message: The user's message or full conversation context
-            conversation_history: Optional list of previous messages (not currently used)
-            use_full_prompt: If True, user_message is treated as a complete prompt; if False, system prompt is prepended
+            user_message: The user's message
+            conversation_history: Optional list of previous messages
 
         Returns:
             The LLM's response (either function call JSON or text)
         """
         try:
-            # Build the full prompt
-            if use_full_prompt:
-                # user_message already contains the full conversation context
-                full_prompt = f"{self.get_system_prompt()}\n\n{user_message}"
-            else:
-                # Simple query - add system prompt and format
-                full_prompt = f"{self.get_system_prompt()}\n\nUser: {user_message}\nAssistant:"
+            # Build the full prompt with system prompt and user message
+            full_prompt = f"{self.get_system_prompt()}\n\nUser: {user_message}\nAssistant:"
 
             # Prepare the request payload
             payload = {
@@ -106,8 +93,7 @@ Important rules:
                 "temperature": 0.7,
             }
 
-            logger.info(f"Sending request to LLM (use_full_prompt={use_full_prompt})")
-            logger.debug(f"Prompt preview: {full_prompt[:200]}...")
+            logger.info(f"Sending request to LLM: {user_message}")
 
             # Make the API request
             response = requests.post(self.api_url, json=payload, timeout=60)
@@ -117,7 +103,7 @@ Important rules:
             result = response.json()
             llm_output = result.get("response", "").strip()
 
-            logger.info(f"LLM raw response: {llm_output[:200]}...")
+            logger.info(f"LLM raw response: {llm_output}")
 
             return llm_output
 

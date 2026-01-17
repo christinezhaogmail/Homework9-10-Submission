@@ -15,7 +15,7 @@ fi
 echo "✅ Conda found"
 
 # Check if environment exists
-ENV_NAME="hw9_311"
+ENV_NAME="hw6_310"
 if conda env list | grep -q "^${ENV_NAME} "; then
     echo "⚠️  Environment ${ENV_NAME} already exists"
     read -p "Do you want to recreate it? (y/n) " -n 1 -r
@@ -29,7 +29,7 @@ if conda env list | grep -q "^${ENV_NAME} "; then
     fi
 else
     echo "Creating conda environment: ${ENV_NAME}"
-    conda create -n ${ENV_NAME} python=3.11 -y
+    conda create -n ${ENV_NAME} python=3.10 -y
 fi
 
 echo ""

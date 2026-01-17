@@ -1,0 +1,44 @@
+AI Research Assistant
+
+Function:
+Input: accept live audio query from any computer, for example, mac, linux, or windows.
+Search academic content
+Summarize findings
+Save the results
+Support follow-up questions and context
+
+Tech stack:
+Integrating Faster-Whisper with CosyVoice creates a powerful "Zero-Shot" voice cloning pipeline.
+Leverage Vector (e.g., a semantic search over ArXiv papers) to fetch relevant passages. Function search_arxiv(query) returns top-3 relevant documents or excerpts.
+Use function-calling to orchestrate tools. E.g., LLM’s output can go to search_arxiv, summarize, sync_to_notion. 
+Wrap each tool call with logging.
+Use HiggingFace summarization pipeline to condense retrieved content.
+Save conversation and summary to Notion’s database. Function sync_to_notion(session_id, content)
+
+Sample functions:
+def search_arxiv(query: str) -> List[str]:
+      """Return relevant document passages for the query."""
+      ...
+def summarize(texts: List[str]) -> str:
+      """Return a concise summary of the given passages."""
+      ...
+def sync_to_notion(session_id: str, content: str):
+      """Append the session content and summary to Notion."""
+      ...
+
+LLM Invocation and Logging: wrap LLM calls so that you can see inputs/outputs.
+HTTP API endpoints (FastAPI)
+POST /ask: accept a voice alive or text. Run pipeline and return the answer (audio or text). Process request, call whisper, LLM, summarizer, TTS in order, and return final response. Log activities.
+POST /notion-sync: manually triggers syncing the current conversation to Notion (or done at session end). Log activities.
+GET /status: returns the current session ID or a health check status. Log activities.
+
+Libraries:
+Fastapi, uvicorn, Faster-whisper, transformers, cosyvoice.
+
+Need to install ASR/TTS engines
+
+Run on server: GPU.
+Develop on MacOs M3 or M4.
+Create two separate environment or requirement files.
+Python version is 3.11
+Use conda to handle  

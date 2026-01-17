@@ -20,7 +20,6 @@ from loguru import logger
 from llm_service import LLMService
 from function_router import FunctionRouter
 from audio_service import SpeechToTextService, TextToSpeechService
-from config import Config
 
 # Configure logger
 logger.add("logs/voice_agent_{time}.log", rotation="1 day", retention="7 days", level="INFO")
@@ -42,10 +41,10 @@ app.add_middleware(
 )
 
 # Initialize services
-llm_service = LLMService(model=Config.LLM_MODEL, base_url=Config.OLLAMA_BASE_URL)
+llm_service = LLMService(model="llama3.2")
 function_router = FunctionRouter()
-stt_service = SpeechToTextService(model_name=Config.WHISPER_MODEL)
-tts_service = TextToSpeechService(backend=Config.TTS_BACKEND)
+stt_service = SpeechToTextService(model_name="base")
+tts_service = TextToSpeechService(backend="system")
 
 # Request/Response models
 class TextQueryRequest(BaseModel):
@@ -90,15 +89,10 @@ async def health_check():
     return {
         "status": "healthy",
         "services": {
-            "llm": f"ollama/{Config.LLM_MODEL}",
-            "stt": f"whisper/{Config.WHISPER_MODEL}",
-            "tts": Config.TTS_BACKEND,
+            "llm": "ollama/llama3.2",
+            "stt": "whisper",
+            "tts": "system",
             "tools": list(function_router.tool_registry.keys())
-        },
-        "config": {
-            "ollama_url": Config.OLLAMA_BASE_URL,
-            "temperature": Config.LLM_TEMPERATURE,
-            "summarization_temperature": Config.SUMMARIZATION_TEMPERATURE
         }
     }
 
@@ -106,8 +100,8 @@ async def health_check():
 @app.post("/api/voice-query/", response_model=QueryResponse)
 async def voice_query_endpoint(request: Dict[str, Any]):
     """
-    Main voice query endpoint with multi-step agent loop
-    Processes user queries and executes multiple tool calls if needed
+    Main voice query endpoint
+    Processes user queries and returns responses
 
     Args:
         request: Dictionary with 'text' field containing the user's query
@@ -126,83 +120,37 @@ async def voice_query_endpoint(request: Dict[str, Any]):
         logger.info(f"=== NEW QUERY ===")
         logger.info(f"User Query: {user_text}")
 
-        # Initialize conversation context for multi-step reasoning
-        conversation_context = f"User: {user_text}\nAssistant:"
-        max_iterations = 5  # Prevent infinite loops
-        iteration = 0
+        # Step 1: Generate LLM response
+        logger.info("Step 1: Generating LLM response...")
+        llm_output = llm_service.generate_response(user_text)
+        logger.info(f"Raw LLM Output: {llm_output}")
 
-        # Track all function calls made
-        all_function_calls = []
-        last_function_result = None
-        final_response = None
+        # Step 2: Route the LLM output (detect and execute function calls)
+        logger.info("Step 2: Routing LLM output...")
+        routing_result = function_router.route_llm_output(llm_output)
 
-        # Agent loop: Allow multiple tool calls
-        while iteration < max_iterations:
-            iteration += 1
-            logger.info(f"\n--- Agent Iteration {iteration} ---")
+        logger.info(f"Is Function Call: {routing_result['is_function_call']}")
+        if routing_result['is_function_call']:
+            logger.info(f"Function Name: {routing_result['function_name']}")
+            logger.info(f"Function Args: {routing_result['function_args']}")
 
-            # Step 1: Generate LLM response
-            logger.info(f"Generating LLM response with context...")
-            # Use full_prompt=True for multi-step context after first iteration
-            use_full_prompt = iteration > 1
-            llm_output = llm_service.generate_response(conversation_context, use_full_prompt=use_full_prompt)
-            logger.info(f"Raw LLM Output: {llm_output}")
-
-            # Step 2: Route the LLM output (detect and execute function calls)
-            routing_result = function_router.route_llm_output(llm_output)
-
-            if routing_result['is_function_call']:
-                # It's a function call - execute it
-                logger.info(f"Function Call Detected: {routing_result['function_name']}")
-                logger.info(f"Function Args: {routing_result['function_args']}")
-
-                # Track this function call
-                all_function_calls.append({
-                    "function": routing_result['function_name'],
-                    "args": routing_result['function_args']
-                })
-
-                # Get the function result
-                function_result = routing_result['response']
-                last_function_result = function_result
-                logger.info(f"Function Result (first 200 chars): {function_result[:200]}...")
-
-                # Update conversation context with the function result
-                # Feed the result back to the LLM so it can decide next action
-                conversation_context += f"\n\nTool: {routing_result['function_name']}\nResult: {function_result}\n\nAssistant:"
-
-            else:
-                # It's a text response - this is the final answer
-                logger.info("Text Response Detected - Agent loop complete")
-                final_response = routing_result['response']
-                break
-
-        # If we hit max iterations without a final response, use the last output
-        if final_response is None:
-            logger.warning(f"Max iterations ({max_iterations}) reached without final text response")
-            final_response = last_function_result or llm_output
+        logger.info(f"Final Response: {routing_result['response'][:200]}...")
 
         # Calculate processing time
         processing_time = time.time() - start_time
 
-        # Build response with information about all function calls
+        # Build response
         response = QueryResponse(
             success=True,
             query_text=user_text,
             raw_llm_output=llm_output,
-            is_function_call=len(all_function_calls) > 0,
-            function_name=all_function_calls[0]['function'] if all_function_calls else None,
-            function_args=all_function_calls[0]['args'] if all_function_calls else None,
-            response_text=final_response,
+            is_function_call=routing_result['is_function_call'],
+            function_name=routing_result['function_name'],
+            function_args=routing_result['function_args'],
+            response_text=routing_result['response'],
             processing_time=processing_time
         )
 
-        logger.info(f"\n=== SUMMARY ===")
-        logger.info(f"Total Iterations: {iteration}")
-        logger.info(f"Function Calls Made: {len(all_function_calls)}")
-        for i, fc in enumerate(all_function_calls, 1):
-            logger.info(f"  {i}. {fc['function']}({fc['args']})")
-        logger.info(f"Final Response: {final_response[:200]}...")
         logger.info(f"Processing completed in {processing_time:.2f}s")
         logger.info("=" * 50)
 
