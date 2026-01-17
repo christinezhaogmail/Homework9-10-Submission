@@ -4,7 +4,7 @@ The assistant operates through a **Central Orchestrator** that manages state and
 
 1. **Ingestion:** streamlit captures audio via the browser.
 2. **Platform Detection:** The system detects if it’s on a Mac (M3/M4) or a Linux Server (NVIDIA) and loads the appropriate model weights (MPS vs. CUDA).
-3. **ASR:** `Faster-Whisper` (Large-v3) transcribes audio, handling accents and noise.
+3. **ASR:** `Whisper` (Large-v3) transcribes audio, handling accents and noise.
 4. **The Brain (LLM):** Processes the text query using a **Conversation Buffer** to understand context (e.g., "Tell me more about the *second* paper").
 5. **Tools:** The Brain triggers ArXiv search, summarization, or Notion syncing via function-calling.
 6. **Synthesis:** `CosyVoice` performs zero-shot cloning to read the summary back.
@@ -35,14 +35,14 @@ def get_device():
 
 **`env_mac.yml` (Development)**
 
-* Python 3.11
-* `faster-whisper` + `ctranslate2` (optimized for ARM)
+* Python 3.10
+* `whisper` + `ctranslate2` (optimized for ARM)
 * `faiss-cpu`
 
 **`env_server.yml` (Production)**
 
-* Python 3.11
-* `faster-whisper` + `cuda12`
+* Python 3.10
+* `whisper` + `cuda12`
 * `faiss-gpu`
 * `cosyvoice` (Full requirements)
 
@@ -55,9 +55,10 @@ This Object-Oriented structure ensures that each component can be tested in isol
 ```text
 ai-research-assistant/
 ├── main.py                 # streamlit + FastAPI Entry Point
+├── api.py                  # Data Models for Request/Response
 ├── config.py               # API Keys, Model Paths, Platform detection
 ├── models/
-│   ├── asr.py              # Class VoiceTranscriber (Faster-Whisper)
+│   ├── asr.py              # Class VoiceTranscriber (Whisper)
 │   ├── tts.py              # Class VoiceSynthesizer (CosyVoice)
 │   └── brain.py            # Class ResearchOrchestrator (LLM + Memory)
 ├── tools/
@@ -116,7 +117,7 @@ The streamlit UI will include:
 ## 🧪 Phase 4: Testing & Integration
 
 1. **Unit Testing:** Each class in `models/` and `tools/` will have a `if __name__ == "__main__":` block to allow testing the component without launching the whole API.
-2. **Noise/Accent Test:** Using `Faster-Whisper`'s `beam_size=5` and `initial_prompt` to improve transcription of technical jargon.
+2. **Noise/Accent Test:** Using `Whisper`'s `beam_size=5` and `initial_prompt` to improve transcription of technical jargon.
 3. **FastAPI Endpoints:**
 * `POST /ask`: Wraps the orchestrator.
 * `POST /notion-sync`: Calls the `NotionSync` singleton.

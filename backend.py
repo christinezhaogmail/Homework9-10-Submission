@@ -12,23 +12,38 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
-from pydantic import BaseModel
 
 from loguru import logger
+
+# Import API models
+from api import (
+    TextQueryRequest,
+    QueryResponse,
+    AskRequest,
+    AskResponse,
+    NotionSyncRequest,
+    NotionSyncResponse,
+    StatusResponse,
+    HealthResponse,
+    TranscribeResponse
+)
 
 # Import our services
 from llm_service import LLMService
 from function_router import FunctionRouter
 from audio_service import SpeechToTextService, TextToSpeechService
+from utils.session_manager import SessionManager
+from tools.summarize import ContentSummarizer
+from tools.notion import NotionSync
 
 # Configure logger
 logger.add("logs/voice_agent_{time}.log", rotation="1 day", retention="7 days", level="INFO")
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="AI Voice Agent API",
-    description="REST API for AI Voice Agent with function calling",
-    version="1.0.0"
+    title="AI Research Assistant API",
+    description="REST API for AI Research Assistant with function calling, summarization, and Notion sync",
+    version="2.0.0"
 )
 
 # Add CORS middleware
@@ -45,31 +60,11 @@ llm_service = LLMService(model="llama3.2")
 function_router = FunctionRouter()
 stt_service = SpeechToTextService(model_name="base")
 tts_service = TextToSpeechService(backend="system")
+session_manager = SessionManager(max_history=10)
+notion_sync = NotionSync()
 
-# Request/Response models
-class TextQueryRequest(BaseModel):
-    """Request model for text-based queries"""
-    text: str
-    include_audio: bool = False
-
-
-class VoiceQueryRequest(BaseModel):
-    """Request model for voice queries"""
-    text: Optional[str] = None
-
-
-class QueryResponse(BaseModel):
-    """Response model for all queries"""
-    success: bool
-    query_text: str
-    raw_llm_output: str
-    is_function_call: bool
-    function_name: Optional[str]
-    function_args: Optional[Dict[str, Any]]
-    response_text: str
-    audio_path: Optional[str] = None
-    processing_time: float
-    error: Optional[str] = None
+# Initialize summarizer (lazy loading - only when needed)
+summarizer = None
 
 
 # Health check endpoint
@@ -83,18 +78,255 @@ async def root():
     }
 
 
-@app.get("/health")
+@app.get("/health", response_model=HealthResponse)
 async def health_check():
     """Detailed health check"""
-    return {
-        "status": "healthy",
-        "services": {
+    return HealthResponse(
+        status="healthy",
+        services={
             "llm": "ollama/llama3.2",
             "stt": "whisper",
             "tts": "system",
-            "tools": list(function_router.tool_registry.keys())
+            "tools": list(function_router.tool_registry.keys()),
+            "notion_sync": notion_sync.is_enabled()
         }
-    }
+    )
+
+
+@app.get("/status", response_model=StatusResponse)
+async def get_status(session_id: Optional[str] = None):
+    """
+    Get system status and session information.
+
+    Args:
+        session_id: Optional session ID to get specific session info
+
+    Returns:
+        Status dictionary with session info
+    """
+    logger.info(f"Status check requested (session_id={session_id})")
+
+    if session_id:
+        session_summary = session_manager.get_session_summary(session_id)
+        if session_summary:
+            return StatusResponse(
+                status="healthy",
+                session=session_summary
+            )
+        else:
+            return StatusResponse(
+                status="healthy",
+                session=None,
+                message=f"Session {session_id} not found"
+            )
+    else:
+        return StatusResponse(
+            status="healthy",
+            total_sessions=len(session_manager.get_all_sessions()),
+            services={
+                "llm": "ollama/llama3.2",
+                "stt": "whisper",
+                "tts": "system",
+                "notion_sync": notion_sync.is_enabled()
+            }
+        )
+
+
+@app.post("/ask", response_model=AskResponse)
+async def ask_endpoint(
+    text: str = Form(...),
+    session_id: Optional[str] = Form(None),
+    include_summary: bool = Form(False)
+):
+    """
+    Main research assistant endpoint.
+    Accepts text or voice query, runs the full pipeline, and returns response.
+
+    Args:
+        text: User query text
+        session_id: Optional session ID for conversation context
+        include_summary: Whether to generate summary of the response
+
+    Returns:
+        Response with answer, session info, and optional summary
+    """
+    start_time = time.time()
+
+    try:
+        # Create or get session
+        if not session_id:
+            session_id = session_manager.create_session()
+            logger.info(f"Created new session: {session_id}")
+        else:
+            if not session_manager.get_session(session_id):
+                session_id = session_manager.create_session()
+                logger.info(f"Session not found, created new one: {session_id}")
+
+        logger.info(f"=== ASK REQUEST (Session: {session_id}) ===")
+        logger.info(f"User Query: {text}")
+
+        # Add user message to session
+        session_manager.add_message(session_id, "user", text)
+
+        # Step 1: Generate LLM response
+        logger.info("Step 1: Generating LLM response...")
+        llm_output = llm_service.generate_response(text)
+        logger.info(f"Raw LLM Output: {llm_output}")
+
+        # Step 2: Route the LLM output (detect and execute function calls)
+        logger.info("Step 2: Routing LLM output...")
+        routing_result = function_router.route_llm_output(llm_output)
+
+        logger.info(f"Is Function Call: {routing_result['is_function_call']}")
+        if routing_result['is_function_call']:
+            logger.info(f"Function Name: {routing_result['function_name']}")
+            logger.info(f"Function Args: {routing_result['function_args']}")
+
+        response_text = routing_result['response']
+        logger.info(f"Final Response: {response_text[:200]}...")
+
+        # Add assistant message to session
+        session_manager.add_message(
+            session_id,
+            "assistant",
+            response_text,
+            metadata={
+                "is_function_call": routing_result['is_function_call'],
+                "function_name": routing_result['function_name'],
+                "function_args": routing_result['function_args']
+            }
+        )
+
+        # Step 3: Generate summary if requested
+        summary = None
+        if include_summary:
+            try:
+                global summarizer
+                if summarizer is None:
+                    logger.info("Initializing summarizer...")
+                    summarizer = ContentSummarizer()
+
+                summary = summarizer.summarize(response_text)
+                logger.info(f"Generated summary: {summary[:100]}...")
+            except Exception as e:
+                logger.error(f"Summarization failed: {e}")
+                summary = None
+
+        processing_time = time.time() - start_time
+
+        # Build response
+        logger.info(f"Processing completed in {processing_time:.2f}s")
+        logger.info("=" * 50)
+
+        return AskResponse(
+            success=True,
+            session_id=session_id,
+            query_text=text,
+            response_text=response_text,
+            summary=summary,
+            is_function_call=routing_result['is_function_call'],
+            function_name=routing_result['function_name'],
+            function_args=routing_result['function_args'],
+            processing_time=processing_time,
+            query_count=session_manager.get_session(session_id)["query_count"]
+        )
+
+    except Exception as e:
+        logger.error(f"Error processing ask request: {str(e)}")
+        processing_time = time.time() - start_time
+
+        return AskResponse(
+            success=False,
+            session_id=session_id if 'session_id' in locals() else "",
+            query_text=text,
+            response_text=f"Error: {str(e)}",
+            processing_time=processing_time,
+            query_count=0,
+            error=str(e)
+        )
+
+
+@app.post("/notion-sync", response_model=NotionSyncResponse)
+async def notion_sync_endpoint(
+    session_id: str = Form(...),
+    include_summary: bool = Form(True)
+):
+    """
+    Sync session conversation to Notion.
+
+    Args:
+        session_id: Session ID to sync
+        include_summary: Whether to generate and include a summary
+
+    Returns:
+        Sync result with Notion page URL
+    """
+    try:
+        logger.info("=== NOTION SYNC REQUEST ===")
+        logger.info(f"Session ID: {session_id}")
+
+        # Check if session exists
+        session = session_manager.get_session(session_id)
+        if not session:
+            raise HTTPException(status_code=404, detail=f"Session {session_id} not found")
+
+        # Check if Notion sync is enabled
+        if not notion_sync.is_enabled():
+            return NotionSyncResponse(
+                success=False,
+                session_id=session_id,
+                message="Notion sync is not enabled. Set NOTION_TOKEN and NOTION_DATABASE_ID environment variables."
+            )
+
+        # Get conversation text
+        conversation_text = session_manager.get_conversation_text(session_id, include_metadata=True)
+
+        # Generate summary if requested
+        summary = None
+        if include_summary:
+            try:
+                global summarizer
+                if summarizer is None:
+                    logger.info("Initializing summarizer...")
+                    summarizer = ContentSummarizer()
+
+                summary = summarizer.summarize(conversation_text, max_length=200)
+                logger.info("Generated conversation summary")
+            except Exception as e:
+                logger.error(f"Summarization failed: {e}")
+                summary = None
+
+        # Sync to Notion
+        page_url = notion_sync.sync_session(
+            session_id=session_id,
+            content=conversation_text,
+            summary=summary,
+            metadata={
+                "query_count": session["query_count"],
+                "created_at": session["created_at"]
+            }
+        )
+
+        if page_url:
+            logger.info(f"✓ Synced to Notion: {page_url}")
+            return NotionSyncResponse(
+                success=True,
+                session_id=session_id,
+                notion_url=page_url,
+                message="Session synced successfully"
+            )
+        else:
+            return NotionSyncResponse(
+                success=False,
+                session_id=session_id,
+                message="Failed to sync to Notion"
+            )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error syncing to Notion: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/api/voice-query/", response_model=QueryResponse)
@@ -187,7 +419,7 @@ async def text_query_endpoint(request: TextQueryRequest):
     return await voice_query_endpoint({"text": request.text})
 
 
-@app.post("/api/transcribe/")
+@app.post("/api/transcribe/", response_model=TranscribeResponse)
 async def transcribe_audio(audio_file: UploadFile = File(...)):
     """
     Transcribe audio file to text
@@ -213,10 +445,10 @@ async def transcribe_audio(audio_file: UploadFile = File(...)):
         # Clean up
         os.unlink(temp_path)
 
-        return {
-            "success": True,
-            "transcription": transcription
-        }
+        return TranscribeResponse(
+            success=True,
+            transcription=transcription
+        )
 
     except Exception as e:
         logger.error(f"Error transcribing audio: {e}")

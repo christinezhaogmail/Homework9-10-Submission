@@ -90,7 +90,7 @@ except Exception as e:
     print(f"❌ Error importing CosyVoice: {e}")
     print("\nTroubleshooting:")
     print("1. Make sure CosyVoice is properly installed")
-    print("2. Try: cd /path/to/CosyVoice && pip install -r requirements.txt")
+    print("2. Try: cd /home/jovyan/CosyVoice && pip install -r requirements.txt")
     print("3. Check that all dependencies are installed")
     sys.exit(1)
 
