@@ -1,5 +1,5 @@
 """
-Configuration settings for the AI Voice Agent
+Configuration settings for the Research Assistant
 """
 
 import os

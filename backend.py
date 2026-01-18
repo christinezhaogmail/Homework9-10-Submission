@@ -1,5 +1,5 @@
 """
-FastAPI Backend for AI Voice Agent
+FastAPI Backend for Research Assistant
 Provides REST API endpoints for voice interactions
 """
 
@@ -73,7 +73,7 @@ async def root():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "service": "AI Voice Agent API",
+        "service": "Research Assistant API",
         "version": "1.0.0"
     }
 
@@ -546,7 +546,7 @@ async def full_voice_query(audio_file: UploadFile = File(...)):
 if __name__ == "__main__":
     import uvicorn
 
-    logger.info("Starting AI Voice Agent API server...")
+    logger.info("Starting Research Assistant API server...")
     logger.info("API will be available at: http://localhost:8000")
     logger.info("API docs at: http://localhost:8000/docs")
 

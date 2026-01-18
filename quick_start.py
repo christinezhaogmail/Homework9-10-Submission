@@ -1,5 +1,5 @@
 """
-Quick Start Script for AI Voice Agent
+Quick Start Script for Research Assistant
 Interactive command-line interface for testing the agent
 """
 
@@ -16,7 +16,7 @@ from audio_service import VoiceAgentAudio
 
 print("""
 ╔═══════════════════════════════════════════════════════════════════╗
-║                    AI VOICE AGENT - QUICK START                   ║
+║                    Research Assistant - QUICK START                   ║
 ╚═══════════════════════════════════════════════════════════════════╝
 
 Welcome! This is a quick command-line interface to test the voice agent.
@@ -65,7 +65,7 @@ def show_help():
 ║                              HELP                                 ║
 ╚═══════════════════════════════════════════════════════════════════╝
 
-The AI Voice Agent can:
+The Research Assistant can:
 1. Perform mathematical calculations using SymPy
 2. Search for scientific papers on arXiv
 3. Have general conversations
@@ -164,7 +164,7 @@ def main():
 
             # Handle commands
             if user_input.lower() in ['quit', 'exit', 'q']:
-                print("\n👋 Goodbye! Thank you for using the AI Voice Agent.")
+                print("\n👋 Goodbye! Thank you for using the Research Assistant.")
                 voice_agent.speak_response("Goodbye! Have a great day!")
                 break
 

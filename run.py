@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Run Script - Easy launcher for AI Voice Agent
+Run Script - Easy launcher for Research Assistant
 Choose how you want to run the application
 """
 
@@ -11,7 +11,7 @@ import os
 def print_banner():
     print("""
 ╔═══════════════════════════════════════════════════════════════════╗
-║                       AI VOICE AGENT                              ║
+║                       Research Assistant                              ║
 ║                      Easy Launcher                                ║
 ╚═══════════════════════════════════════════════════════════════════╝
 """)
@@ -39,7 +39,7 @@ def main():
     else:
         print("✅ Ollama is running\n")
 
-    print("Choose how you want to run the AI Voice Agent:\n")
+    print("Choose how you want to run the Research Assistant:\n")
     print("1. Quick Start CLI (Interactive command-line)")
     print("2. Streamlit Web Interface (Recommended)")
     print("3. FastAPI Backend Only")

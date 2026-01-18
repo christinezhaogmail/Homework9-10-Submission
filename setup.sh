@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "=========================================="
-echo "AI Voice Agent - Setup Script"
+echo "Research Assistant - Setup Script"
 echo "=========================================="
 echo ""
 

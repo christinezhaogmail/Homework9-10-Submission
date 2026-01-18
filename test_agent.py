@@ -1,5 +1,5 @@
 """
-Test script for the AI Voice Agent
+Test script for the Research Assistant
 Tests all components: tools, LLM, routing, and integration
 """
 
@@ -140,7 +140,7 @@ def test_end_to_end():
 def main():
     """Run all tests"""
     print("\n" + "=" * 70)
-    print("AI VOICE AGENT - COMPREHENSIVE TEST SUITE")
+    print("Research Assistant - COMPREHENSIVE TEST SUITE")
     print("=" * 70)
 
     try:
@@ -153,7 +153,7 @@ def main():
         print("\n" + "=" * 70)
         print("🎉 ALL TESTS PASSED SUCCESSFULLY!")
         print("=" * 70)
-        print("\nThe AI Voice Agent is ready to use.")
+        print("\nThe Research Assistant is ready to use.")
         print("\nNext steps:")
         print("1. Start the FastAPI backend: python backend.py")
         print("2. Start the Streamlit frontend: streamlit run frontend.py")
