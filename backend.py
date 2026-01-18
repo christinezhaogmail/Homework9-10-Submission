@@ -165,12 +165,17 @@ async def ask_endpoint(
         logger.info(f"=== ASK REQUEST (Session: {session_id}) ===")
         logger.info(f"User Query: {text}")
 
+        # Get conversation history for context (BEFORE adding current message)
+        session_data = session_manager.get_session(session_id)
+        conversation_history = session_data.get("history", [])[-10:]  # Last 10 messages for context
+
         # Add user message to session
         session_manager.add_message(session_id, "user", text)
 
-        # Step 1: Generate LLM response
+        # Step 1: Generate LLM response with conversation context
         logger.info("Step 1: Generating LLM response...")
-        llm_output = llm_service.generate_response(text)
+        logger.info(f"Conversation history length: {len(conversation_history)}")
+        llm_output = llm_service.generate_response(text, conversation_history=conversation_history)
         logger.info(f"Raw LLM Output: {llm_output}")
 
         # Step 2: Route the LLM output (detect and execute function calls)

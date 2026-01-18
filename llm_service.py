@@ -76,14 +76,25 @@ Important rules:
 
         Args:
             user_message: The user's message
-            conversation_history: Optional list of previous messages
+            conversation_history: Optional list of previous messages (dicts with 'role' and 'content')
 
         Returns:
             The LLM's response (either function call JSON or text)
         """
         try:
-            # Build the full prompt with system prompt and user message
-            full_prompt = f"{self.get_system_prompt()}\n\nUser: {user_message}\nAssistant:"
+            # Build the full prompt with system prompt
+            full_prompt = self.get_system_prompt()
+
+            # Add conversation history if provided
+            if conversation_history:
+                full_prompt += "\n\nPrevious conversation:"
+                for msg in conversation_history:
+                    role = msg.get('role', 'user').title()
+                    content = msg.get('content', '')
+                    full_prompt += f"\n{role}: {content}"
+
+            # Add current user message
+            full_prompt += f"\n\nUser: {user_message}\nAssistant:"
 
             # Prepare the request payload
             payload = {

@@ -121,26 +121,22 @@ def query_local(text: str) -> Dict[str, Any]:
     try:
         start_time = time.time()
 
-        # Build conversation context from message history
-        conversation_context = ""
+        # Get conversation history from messages (last 10 for context)
+        # Exclude the current user message which is already in the messages list
+        conversation_history = []
         if st.session_state.messages:
-            # Get last 5 messages for context
-            recent_messages = st.session_state.messages[-10:]
-            context_parts = []
-            for msg in recent_messages:
-                role = msg["role"].title()
-                content = msg["content"]
-                context_parts.append(f"{role}: {content}")
-            conversation_context = "\n".join(context_parts)
+            # Get messages except the last one (which is the current query)
+            recent_messages = st.session_state.messages[:-1][-10:]  # Exclude last, then take last 10
+            conversation_history = [
+                {"role": msg["role"], "content": msg["content"]}
+                for msg in recent_messages
+            ]
 
-        # Build prompt with context
-        if conversation_context:
-            prompt_with_context = f"Previous conversation:\n{conversation_context}\n\nCurrent question: {text}"
-        else:
-            prompt_with_context = text
-
-        # Get LLM response
-        llm_output = st.session_state.llm_service.generate_response(prompt_with_context)
+        # Get LLM response with conversation history
+        llm_output = st.session_state.llm_service.generate_response(
+            text,
+            conversation_history=conversation_history
+        )
 
         # Route and execute
         routing_result = st.session_state.function_router.route_llm_output(llm_output)
