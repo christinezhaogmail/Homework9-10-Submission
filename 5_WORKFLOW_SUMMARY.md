@@ -9,7 +9,6 @@ The system automatically summarizes and saves research sessions to Notion after 
 ## Key Changes
 
 ### 1. agent_tools.py
-- **Removed:** `calculate` function (no longer needed)
 - **Added:** `summarize_and_save` function that:
   - Accepts session content, arXiv papers, and query count
   - Generates a summary of the research session
@@ -18,7 +17,6 @@ The system automatically summarizes and saves research sessions to Notion after 
 
 ### 2. llm_service.py
 - **Updated system prompt** to focus on arXiv research assistance
-- **Removed** all references to the `calculate` function
 - **Added** guidance about automatic Notion saving after 3 queries
 - **Improved** examples to focus on research-oriented queries
 
