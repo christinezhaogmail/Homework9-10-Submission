@@ -4,7 +4,6 @@ Configuration settings for the Research Assistant
 
 import os
 from pathlib import Path
-from typing import Optional
 
 
 class Config:
@@ -45,6 +44,11 @@ class Config:
     # Tool settings
     ARXIV_MAX_RESULTS = int(os.getenv("ARXIV_MAX_RESULTS", "3"))
 
+    # Notion integration settings
+    NOTION_TOKEN = os.getenv("NOTION_TOKEN", "")
+    NOTION_DATABASE_ID = os.getenv("NOTION_DATABASE_ID", "")
+    AUTO_SAVE_THRESHOLD = int(os.getenv("AUTO_SAVE_THRESHOLD", "1"))  # Trigger save after N arxiv queries (default: 1)
+
     @classmethod
     def ensure_directories(cls):
         """Create necessary directories if they don't exist"""
@@ -60,6 +64,9 @@ class Config:
             "tts_backend": cls.TTS_BACKEND,
             "api_host": cls.API_HOST,
             "api_port": cls.API_PORT,
+            "arxiv_max_results": cls.ARXIV_MAX_RESULTS,
+            "auto_save_threshold": cls.AUTO_SAVE_THRESHOLD,
+            "notion_configured": bool(cls.NOTION_TOKEN and cls.NOTION_DATABASE_ID),
         }
 
 

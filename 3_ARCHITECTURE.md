@@ -440,10 +440,10 @@
 │ │ # ASR/TTS Configuration                             │ │
 │ │ WHISPER_MODEL=base                                  │ │
 │ │ TTS_BACKEND=system  # or pyttsx3, cosyvoice         │ │
-│ │ COSYVOICE_PATH=/home/jovyan/CosyVoice                   │ │
+│ │ COSYVOICE_PATH=/home/jovyan/CosyVoice               │ │
 │ │                                                     │ │
 │ │ # Notion Integration                                │ │
-│ │ NOTION_TOKEN=ntn_xyz123...                       │ │
+│ │ NOTION_TOKEN=ntn_xyz123...                          │ │
 │ │ NOTION_DATABASE_ID=abc123...                        │ │
 │ │                                                     │ │
 │ │ # ArXiv                                             │ │

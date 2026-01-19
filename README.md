@@ -18,7 +18,7 @@ A full-stack AI-powered research assistant that accepts voice queries, searches 
 - **📚 Notion Integration**: Persist conversations and summaries to Notion database
 - **🔊 Text-to-Speech**: Multiple TTS backends (system, pyttsx3, CosyVoice)
 - **🖥️ Hardware Agnostic**: Auto-detects CUDA/MPS/CPU and optimizes accordingly
-- **🎯 Function Calling**: LLM intelligently routes to tools (search, calculate, etc.)
+- **🎯 Function Calling**: LLM intelligently routes to tools (search, summarize, etc.)
 - **⚡ RESTful API**: FastAPI backend with OpenAPI documentation
 - **🎨 Interactive UI**: Streamlit frontend with audio I/O
 
@@ -82,10 +82,10 @@ FastAPI Backend
     ↓
 Function Router
     ↓
-┌───┼───┬───┐
-↓   ↓   ↓   ↓
-Search  Summarize  Notion  Calculate
-(ArXiv) (HF)       (API)   (SymPy)
+┌───┴────────┬──────┐
+↓            ↓      ↓
+Search  Summarize  Notion
+(ArXiv)    (HF)    (API)
 ```
 
 ### Key Components
@@ -250,7 +250,7 @@ Returns system health and available services.
     "llm": "ollama/llama3.2",
     "stt": "whisper",
     "tts": "system",
-    "tools": ["search_arxiv", "calculate"],
+    "tools": ["search_arxiv", "summarize"],
     "notion_sync": true
   }
 }
@@ -429,7 +429,7 @@ ai-research-assistant/
 ├── config.py               # Configuration management
 ├── llm_service.py          # LLM integration (Ollama)
 ├── function_router.py      # Function call routing
-├── agent_tools.py          # LangChain tools (search_arxiv, calculate)
+├── agent_tools.py          # LangChain tools (search_arxiv, summarize)
 ├── audio_service.py        # Legacy audio services
 │
 ├── models/                 # AI Model layer
@@ -519,7 +519,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 For issues, questions, or suggestions:
-- 📧 Email: your.email@example.com
+- 📧 Email: christine.hiaiperf@gmail.com
 - 🐛 Issues: [GitHub Issues](https://github.com/christinezhaogmail/ai-research-assistant/issues)
 - 📖 Documentation: [Full docs](https://github.com/christinezhaogmail/ai-research-assistant/wiki)
 

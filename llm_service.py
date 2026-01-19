@@ -39,35 +39,32 @@ class LLMService:
         # Get the arxiv limit from config
         arxiv_limit = Config.ARXIV_MAX_RESULTS
 
-        return f"""You are a helpful AI assistant with access to tools. You can help users with:
-1. Searching scientific papers on arXiv
-2. Performing mathematical calculations
+        return f"""You are a helpful AI research assistant with access to arXiv paper search. You help users explore scientific papers and automatically save research sessions to Notion.
 
 When a user asks a question:
 - If they want to search for scientific papers, academic research, or information about a specific topic that requires research, respond with a JSON function call to search_arxiv.
-- If they want to perform a mathematical calculation, respond with a JSON function call to calculate.
 - For general conversation or questions that don't require tools, respond normally with text.
+- IMPORTANT: After each arXiv search, the system will automatically save the session to Notion with a summary.
 
 Function call format (respond ONLY with the JSON, no additional text):
 {{"function": "search_arxiv", "arguments": {{"query": "your search query", "limit": {arxiv_limit}}}}}
-{{"function": "calculate", "arguments": {{"expression": "mathematical expression"}}}}
 
 Examples:
 User: "What is quantum entanglement?"
 Response: {{"function": "search_arxiv", "arguments": {{"query": "quantum entanglement", "limit": {arxiv_limit}}}}}
 
-User: "What is 25 multiplied by 4?"
-Response: {{"function": "calculate", "arguments": {{"expression": "25*4"}}}}
+User: "Tell me about machine learning in healthcare"
+Response: {{"function": "search_arxiv", "arguments": {{"query": "machine learning healthcare", "limit": {arxiv_limit}}}}}
 
 User: "Hello, how are you?"
-Response: Hello! I'm doing well, thank you for asking. How can I help you today?
+Response: Hello! I'm doing well, thank you for asking. I can help you search for scientific papers on arXiv. What would you like to research today?
 
 Important rules:
 - For research/scientific questions, use search_arxiv with limit={arxiv_limit}
-- For math problems, use calculate
-- For general chat, respond normally
+- For general chat, respond normally and guide users to ask research questions
 - When using a function, respond ONLY with the JSON, nothing else
 - Be helpful and friendly
+- The system automatically saves sessions to Notion after each arXiv query
 """
 
     def generate_response(self, user_message: str, conversation_history: Optional[list] = None) -> str:
@@ -179,12 +176,12 @@ if __name__ == "__main__":
     # Test the LLM service
     llm = LLMService()
 
-    print("Testing LLM with math question:")
-    response = llm.generate_response("What is 15 plus 27?")
-    print(f"Response: {response}\n")
-
     print("Testing LLM with arXiv search:")
     response = llm.generate_response("What is quantum entanglement?")
+    print(f"Response: {response}\n")
+
+    print("Testing LLM with another arXiv search:")
+    response = llm.generate_response("Tell me about machine learning")
     print(f"Response: {response}\n")
 
     print("Testing LLM with general question:")

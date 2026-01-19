@@ -42,12 +42,6 @@ if 'last_audio_response' not in st.session_state:
     st.session_state.last_audio_response = None
 if 'processing_query' not in st.session_state:
     st.session_state.processing_query = False
-if 'session_id' not in st.session_state:
-    st.session_state.session_id = None  # Will be created on first query
-if 'api_url' not in st.session_state:
-    st.session_state.api_url = "http://localhost:8000"
-if 'notion_sync_enabled' not in st.session_state:
-    st.session_state.notion_sync_enabled = True  # Default: Notion sync enabled
 
 
 def init_services():
@@ -67,39 +61,25 @@ def init_services():
         )
 
 
-def query_api(text: str) -> Dict[str, Any]:
+def query_api(text: str, api_url: str = "http://localhost:8000") -> Dict[str, Any]:
     """
-    Query the FastAPI backend with session support
+    Query the FastAPI backend
 
     Args:
         text: User's query text
+        api_url: Base URL of the API
 
     Returns:
         Response dictionary
     """
     try:
-        # Prepare form data
-        data = {"text": text}
-
-        # Add session_id if we have one
-        if st.session_state.session_id:
-            data["session_id"] = st.session_state.session_id
-
-        api_url = st.session_state.api_url
         response = requests.post(
-            f"{api_url}/ask",
-            data=data,
+            f"{api_url}/api/voice-query/",
+            json={"text": text},
             timeout=60
         )
         response.raise_for_status()
-        result = response.json()
-
-        # Update session_id if returned
-        if "session_id" in result:
-            st.session_state.session_id = result["session_id"]
-            logger.info(f"Session ID updated: {result['session_id']}")
-
-        return result
+        return response.json()
     except Exception as e:
         return {
             "success": False,
@@ -110,7 +90,7 @@ def query_api(text: str) -> Dict[str, Any]:
 
 def query_local(text: str) -> Dict[str, Any]:
     """
-    Query using local services (no API) with conversation context
+    Query using local services (no API)
 
     Args:
         text: User's query text
@@ -121,22 +101,8 @@ def query_local(text: str) -> Dict[str, Any]:
     try:
         start_time = time.time()
 
-        # Get conversation history from messages (last 10 for context)
-        # Exclude the current user message which is already in the messages list
-        conversation_history = []
-        if st.session_state.messages:
-            # Get messages except the last one (which is the current query)
-            recent_messages = st.session_state.messages[:-1][-10:]  # Exclude last, then take last 10
-            conversation_history = [
-                {"role": msg["role"], "content": msg["content"]}
-                for msg in recent_messages
-            ]
-
-        # Get LLM response with conversation history
-        llm_output = st.session_state.llm_service.generate_response(
-            text,
-            conversation_history=conversation_history
-        )
+        # Get LLM response
+        llm_output = st.session_state.llm_service.generate_response(text)
 
         # Route and execute
         routing_result = st.session_state.function_router.route_llm_output(llm_output)
@@ -233,43 +199,6 @@ def format_response_details(response: Dict[str, Any]) -> str:
     return "\n\n".join(details)
 
 
-def sync_to_notion() -> Dict[str, Any]:
-    """
-    Sync current conversation to Notion
-
-    Returns:
-        Response dictionary with success status and Notion URL
-    """
-    try:
-        if not st.session_state.session_id:
-            return {
-                "success": False,
-                "message": "No active session to sync"
-            }
-
-        response = requests.post(
-            f"{st.session_state.api_url}/notion-sync",
-            data={
-                "session_id": st.session_state.session_id,
-                "include_summary": True
-            },
-            timeout=30
-        )
-
-        if response.ok:
-            return response.json()
-        else:
-            return {
-                "success": False,
-                "message": f"API error: {response.status_code}"
-            }
-    except Exception as e:
-        return {
-            "success": False,
-            "message": f"Error: {str(e)}"
-        }
-
-
 # Main UI
 st.title("🤖 Research Assistant")
 
@@ -279,7 +208,7 @@ if st.session_state.voice_mode:
 else:
     st.info("💬 Text Mode: Voice mode disabled")
 
-st.markdown("Ask me anything! I can search scientific papers and perform calculations.")
+st.markdown("Ask me anything! I can search scientific papers on arXiv and automatically save sessions to Notion.")
 
 # Sidebar configuration
 with st.sidebar:
@@ -295,7 +224,6 @@ with st.sidebar:
 
     if use_api:
         api_url = st.text_input("API URL", value="http://localhost:8000")
-        st.session_state.api_url = api_url  # Store in session state
         # Test API connection
         if st.button("Test Connection"):
             try:
@@ -317,20 +245,11 @@ with st.sidebar:
     # Voice Settings
     st.header("🎙️ Voice Settings")
 
-    # Store previous state to detect changes
-    previous_voice_mode = st.session_state.voice_mode
-
     voice_mode = st.checkbox(
         "Enable Voice Mode",
         value=st.session_state.voice_mode,
         help="Enable audio input and output"
     )
-
-    # Detect change and trigger rerun if needed
-    if voice_mode != previous_voice_mode:
-        st.session_state.voice_mode = voice_mode
-        st.rerun()
-
     st.session_state.voice_mode = voice_mode
 
     if voice_mode and not use_api:
@@ -352,25 +271,6 @@ with st.sidebar:
 
     st.divider()
 
-    # Session Management
-    st.header("💬 Session Management")
-
-    if st.session_state.session_id:
-        st.success(f"🔗 Active Session")
-        st.code(st.session_state.session_id, language="text")
-        st.caption("Session ID is maintained across queries for conversation context")
-
-        if st.button("🔄 Start New Session"):
-            st.session_state.session_id = None
-            st.session_state.messages = []
-            st.session_state.query_count = 0
-            st.success("New session created!")
-            st.rerun()
-    else:
-        st.info("🆕 No active session - will be created on first query")
-
-    st.divider()
-
     # Statistics
     st.header("📊 Statistics")
     st.metric("Total Queries", st.session_state.query_count)
@@ -382,70 +282,26 @@ with st.sidebar:
     if st.button("🗑️ Clear Conversation"):
         st.session_state.messages = []
         st.session_state.query_count = 0
-        st.session_state.session_id = None
         st.rerun()
-
-    st.divider()
-
-    # Notion Sync (always visible in API mode)
-    if st.session_state.use_api:
-        st.header("📝 Notion Sync")
-
-        # Auto-sync toggle
-        notion_sync_enabled = st.checkbox(
-            "Auto-sync to Notion",
-            value=st.session_state.notion_sync_enabled,
-            help="Automatically save conversations to Notion after each query"
-        )
-        st.session_state.notion_sync_enabled = notion_sync_enabled
-
-        # Show session status
-        if st.session_state.session_id:
-            st.caption(f"✅ Active session: `{st.session_state.session_id[:20]}...`")
-        else:
-            st.caption("⏳ No active session yet (will be created on first query)")
-
-        # Manual sync button
-        if st.button("💾 Sync Now"):
-            if not st.session_state.session_id:
-                st.warning("⚠️ No active session. Ask a question first!")
-            else:
-                with st.spinner("Syncing to Notion..."):
-                    result = sync_to_notion()
-
-                    if result.get("success"):
-                        st.success("✅ Synced to Notion!")
-                        if result.get("notion_url"):
-                            st.markdown(f"[Open in Notion]({result['notion_url']})")
-                    else:
-                        st.error(f"❌ Sync failed: {result.get('message', 'Unknown error')}")
-
-        if notion_sync_enabled:
-            st.caption("🔄 Auto-sync is enabled - conversations will be saved automatically")
 
     st.divider()
 
     # Example queries
     st.header("💡 Example Queries")
     st.markdown("""
-    **arXiv Search with Follow-ups:**
+    **arXiv Search (Auto-saves to Notion):**
     - What is quantum entanglement?
-    - *Then ask:* Tell me more about the second paper
-    - *Then ask:* What are the practical applications?
-
-    **Math Calculations:**
-    - What is 25 multiplied by 4?
-    - Calculate sqrt(144)
-    - What is 1 divided by 0?
-
-    **Conversation Context:**
-    - Find papers on neural networks
-    - *Then ask:* Which one is most recent?
-    - *Then ask:* Summarize the first one
+    - Search for papers on neural networks
+    - Find research on climate change
+    - Tell me about machine learning in healthcare
+    - What are the latest papers on AI safety?
+    - Search for quantum computing algorithms
 
     **General Chat:**
     - Hello, how are you?
-    - Tell me about yourself
+    - What can you help me with?
+
+    **Note:** Each arXiv search automatically saves to your Notion database!
     """)
 
 # Display conversation history
@@ -504,7 +360,7 @@ if st.session_state.voice_mode and not st.session_state.use_api:
                     with st.spinner("Thinking..."):
                         # Query based on mode
                         if st.session_state.use_api:
-                            response = query_api(transcription)
+                            response = query_api(transcription, api_url if 'api_url' in locals() else "http://localhost:8000")
                         else:
                             response = query_local(transcription)
 
@@ -551,13 +407,6 @@ if st.session_state.voice_mode and not st.session_state.use_api:
                 # Increment query count
                 st.session_state.query_count += 1
 
-                # Auto-sync to Notion if enabled and using API mode
-                if st.session_state.use_api and st.session_state.notion_sync_enabled and st.session_state.session_id:
-                    logger.info("Auto-syncing to Notion...")
-                    sync_result = sync_to_notion()
-                    if sync_result.get("success"):
-                        logger.info(f"✅ Auto-synced to Notion: {sync_result.get('notion_url', 'No URL')}")
-
                 # Reset processing flag
                 st.session_state.processing_query = False
 
@@ -591,7 +440,7 @@ if user_input and not st.session_state.processing_query:
         with st.spinner("Thinking..."):
             # Query based on mode
             if st.session_state.use_api:
-                response = query_api(user_input)
+                response = query_api(user_input, api_url if 'api_url' in locals() else "http://localhost:8000")
             else:
                 response = query_local(user_input)
 
@@ -637,13 +486,6 @@ if user_input and not st.session_state.processing_query:
 
     # Increment query count
     st.session_state.query_count += 1
-
-    # Auto-sync to Notion if enabled and using API mode
-    if st.session_state.use_api and st.session_state.notion_sync_enabled and st.session_state.session_id:
-        logger.info("Auto-syncing to Notion...")
-        sync_result = sync_to_notion()
-        if sync_result.get("success"):
-            logger.info(f"✅ Auto-synced to Notion: {sync_result.get('notion_url', 'No URL')}")
 
     # Reset processing flag
     st.session_state.processing_query = False
