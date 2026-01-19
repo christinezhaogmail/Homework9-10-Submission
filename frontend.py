@@ -289,7 +289,7 @@ with st.sidebar:
     # Example queries
     st.header("💡 Example Queries")
     st.markdown("""
-    **arXiv Search (Auto-saves to Notion):**
+    **arXiv Search (Returns 3 papers + Auto-saves to Notion):**
     - What is quantum entanglement?
     - Search for papers on neural networks
     - Find research on climate change
@@ -301,7 +301,10 @@ with st.sidebar:
     - Hello, how are you?
     - What can you help me with?
 
-    **Note:** Each arXiv search automatically saves to your Notion database!
+    **Note:**
+    - Each query returns **3 papers** with titles and URLs
+    - Automatically saves summary to Notion after each query
+    - Summary includes all paper titles and arXiv links
     """)
 
 # Display conversation history

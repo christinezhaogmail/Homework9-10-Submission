@@ -1,7 +1,10 @@
 # Auto-Save Workflow Summary
 
 ## Overview
-The system has been improved to automatically summarize and save research sessions to Notion after every arXiv query.
+The system automatically summarizes and saves research sessions to Notion after each arXiv query.
+- **Each query returns 3 papers** (configurable via ARXIV_MAX_RESULTS)
+- **Summary includes all paper titles and arXiv URLs**
+- **Saves to Notion immediately after each query**
 
 ## Key Changes
 
@@ -48,15 +51,28 @@ The system has been improved to automatically summarize and save research sessio
 
 ## Workflow Behavior
 
-**Every arXiv query automatically triggers:**
-1. System searches arXiv and returns results
-2. System automatically:
-   - Summarizes the query and results
+**Single Query Workflow (1 query → 3 papers → Auto-save):**
+
+1. **User makes 1 arXiv query** (e.g., "What is quantum computing?")
+2. **System searches and returns 3 papers** with:
+   - Paper titles
+   - Authors
+   - Publication dates
+   - Summaries
+   - arXiv URLs
+3. **System automatically summarizes and saves to Notion**:
+   - Extracts all 3 paper titles
+   - Extracts all 3 arXiv URLs
+   - Creates summary with titles and clickable links
    - Saves to Notion database
    - Returns Notion page URL
-   - Resets counter
 
-**Configurable threshold:** Set `AUTO_SAVE_THRESHOLD` environment variable to save after N queries instead (default: 1)
+**Example:**
+- Query: "machine learning in healthcare"
+- Results: 3 papers with titles and URLs
+- Auto-save: Notion page with summary listing all 3 papers and their arXiv links
+
+**Configurable:** Set `AUTO_SAVE_THRESHOLD` environment variable to change behavior (default: 1)
 
 ## Configuration
 
@@ -102,19 +118,37 @@ from function_router import FunctionRouter
 
 router = FunctionRouter()
 
-# Every query automatically triggers auto-save!
+# Query 1: Search for quantum computing papers
 result = router.route_llm_output('{"function": "search_arxiv", "arguments": {"query": "quantum computing", "limit": 3}}')
+# Returns 3 papers
 # result['auto_save_triggered'] == True
-# result['auto_save_result'] contains Notion URL
-# Session counter resets to 0
+# result['auto_save_result'] contains:
+#   - Summary with 3 paper titles
+#   - All 3 arXiv URLs
+#   - Notion page URL
 
-# Next query
+# Query 2: Search for machine learning papers (creates new Notion page)
 result2 = router.route_llm_output('{"function": "search_arxiv", "arguments": {"query": "machine learning", "limit": 3}}')
+# Returns 3 different papers
 # result2['auto_save_triggered'] == True
-# Each query creates a new Notion page
+# Creates a separate Notion page with these 3 papers
 
-# To save after N queries instead, set AUTO_SAVE_THRESHOLD=3 in environment
-# Then it will save after every 3 queries
+# Example Notion Summary Format:
+# Research Session Summary (1 arXiv queries)
+#
+# Queries:
+#   • Query 1: quantum computing
+#
+# Papers Found (3 papers):
+#
+# 1. Quantum Computing: A Gentle Introduction
+#    Link: https://arxiv.org/abs/1234.5678
+#
+# 2. Advances in Quantum Algorithms
+#    Link: https://arxiv.org/abs/2345.6789
+#
+# 3. Quantum Error Correction Methods
+#    Link: https://arxiv.org/abs/3456.7890
 ```
 
 ## Future Enhancements

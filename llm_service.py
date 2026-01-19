@@ -44,7 +44,7 @@ class LLMService:
 When a user asks a question:
 - If they want to search for scientific papers, academic research, or information about a specific topic that requires research, respond with a JSON function call to search_arxiv.
 - For general conversation or questions that don't require tools, respond normally with text.
-- IMPORTANT: After each arXiv search, the system will automatically save the session to Notion with a summary.
+- IMPORTANT: Each query returns {arxiv_limit} papers. After each query, the system automatically saves a summary to Notion with all paper titles and arXiv links.
 
 Function call format (respond ONLY with the JSON, no additional text):
 {{"function": "search_arxiv", "arguments": {{"query": "your search query", "limit": {arxiv_limit}}}}}

@@ -62,6 +62,7 @@ def summarize_and_save(
 ) -> str:
     """
     Summarize a research session and save it to Notion database.
+    Extracts arXiv links and creates a comprehensive summary.
 
     Args:
         session_content: The full conversation/session content to summarize
@@ -76,6 +77,7 @@ def summarize_and_save(
 
         # Import NotionSync here to avoid circular imports
         from tools.notion import NotionSync
+        import re
 
         # Initialize Notion sync
         notion_sync = NotionSync()
@@ -86,27 +88,65 @@ def summarize_and_save(
         # Generate session ID
         session_id = f"arxiv_research_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
-        # Create summary
-        summary = f"Research session with {query_count} arXiv queries completed.\n"
+        # Extract arXiv links from the papers string
+        arxiv_links = []
+        paper_titles = []
         if arxiv_papers:
-            summary += f"\nPapers explored:\n{arxiv_papers[:500]}"
+            # Find all arXiv URLs
+            url_pattern = r'URL: (https?://arxiv\.org/[^\s]+)'
+            urls = re.findall(url_pattern, arxiv_papers)
+            arxiv_links.extend(urls)
+
+            # Find all paper titles
+            title_pattern = r'Title: ([^\n]+)'
+            titles = re.findall(title_pattern, arxiv_papers)
+            paper_titles.extend(titles)
+
+        # Create comprehensive summary
+        summary = f"Research Session Summary ({query_count} arXiv queries)\n\n"
+
+        # Add queries from session content
+        if session_content:
+            summary += "Queries:\n"
+            for line in session_content.split('\n'):
+                if line.strip():
+                    summary += f"  • {line}\n"
+            summary += "\n"
+
+        # Add papers with titles and links
+        if paper_titles and arxiv_links:
+            summary += f"Papers Found ({len(paper_titles)} papers):\n\n"
+            for i, (title, url) in enumerate(zip(paper_titles, arxiv_links), 1):
+                summary += f"{i}. {title}\n"
+                summary += f"   Link: {url}\n\n"
+        elif arxiv_links:
+            summary += f"arXiv Links ({len(arxiv_links)} papers):\n"
+            for i, url in enumerate(arxiv_links, 1):
+                summary += f"{i}. {url}\n"
 
         # Prepare metadata
         metadata = {
             "query_count": query_count,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
+            "papers_count": len(arxiv_links)
         }
+
+        # Prepare full content with links
+        full_content = f"{session_content}\n\n{'='*50}\n\nDetailed Results:\n\n{arxiv_papers if arxiv_papers else 'No papers'}"
 
         # Sync to Notion
         page_url = notion_sync.sync_session(
             session_id=session_id,
-            content=session_content,
+            content=full_content,
             summary=summary,
             metadata=metadata
         )
 
         if page_url:
-            response = f"✓ Session summarized and saved to Notion!\nView at: {page_url}\n\nSummary: {summary}"
+            response = f"✓ Session summarized and saved to Notion!\n"
+            response += f"📊 {query_count} queries, {len(arxiv_links)} papers found\n"
+            response += f"🔗 View at: {page_url}\n\n"
+            response += f"Summary:\n{summary[:500]}..."
             logger.info(f"Session saved to Notion: {page_url}")
             return response
         else:

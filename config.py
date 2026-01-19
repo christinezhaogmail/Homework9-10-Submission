@@ -47,7 +47,7 @@ class Config:
     # Notion integration settings
     NOTION_TOKEN = os.getenv("NOTION_TOKEN", "")
     NOTION_DATABASE_ID = os.getenv("NOTION_DATABASE_ID", "")
-    AUTO_SAVE_THRESHOLD = int(os.getenv("AUTO_SAVE_THRESHOLD", "1"))  # Trigger save after N arxiv queries (default: 1)
+    AUTO_SAVE_THRESHOLD = int(os.getenv("AUTO_SAVE_THRESHOLD", "1"))  # Trigger save after each query (1 query = 3 papers)
 
     @classmethod
     def ensure_directories(cls):
